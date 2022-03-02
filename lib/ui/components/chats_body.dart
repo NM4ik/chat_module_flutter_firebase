@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'chat_card.dart';
 
 class ChatsBody extends StatefulWidget {
-  const ChatsBody({Key? key}) : super(key: key);
+  const ChatsBody({Key? key, required this.name}) : super(key: key);
+  final String name;
+
 
   @override
   State<ChatsBody> createState() => _ChatsBodyState();
@@ -31,7 +33,7 @@ class _ChatsBodyState extends State<ChatsBody> {
             child: Row(
               children: [
                 FillOutlineButton(
-                    text: "Recent Message",
+                    text: "Recent Message ${widget.name}",
                     press: () {},
                     isFilled: isFirstButton),
                 const SizedBox(

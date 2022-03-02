@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'auth_provider.dart';
 
 class AndroidAuthProvider implements AuthProvider {
+
   @override
   Future<FirebaseApp> initialize() async {
     return await Firebase.initializeApp(
@@ -17,18 +18,31 @@ class AndroidAuthProvider implements AuthProvider {
     );
   }
 
-
-  //18:53 watch about signInWithGoogle
   @override
   Future<UserCredential> singInWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
 
-    final credential = GoogleAuthProvider.credential(
+    final AuthCredential credential = GoogleAuthProvider.credential(
       accessToken: googleAuth?.accessToken,
       idToken: googleAuth?.idToken,
     );
 
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
+
+  Future<void> signOut() async{
+    return await FirebaseAuth.instance.signOut();
+  }
+
+  Future<bool> isSignedIn() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    return currentUser != null;
+  }
+
+  Future<String?> getUser() async {
+    return (FirebaseAuth.instance.currentUser)?.email;
+  }
 }
+

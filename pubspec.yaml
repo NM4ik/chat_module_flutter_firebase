@@ -40,6 +40,11 @@ dependencies:
   firebase_auth: ^3.3.9
   google_sign_in: ^5.2.4
 
+
+  # for state management
+  flutter_bloc: ^8.0.1
+  equatable:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
