@@ -17,9 +17,6 @@ class InOrOutPage extends StatefulWidget {
 }
 
 class _InOrOutPageState extends State<InOrOutPage> {
-
-  bool _signedIn = false;
-
   // void _signIn() async {
   //   try {
   //     final creds = await AndroidAuthProvider().singInWithGoogle();
@@ -30,51 +27,52 @@ class _InOrOutPageState extends State<InOrOutPage> {
   //   } catch (e) {
   //     print('Login failed: $e');
   //   }
-  //
   // }
-
   @override
   Widget build(BuildContext context) {
     final AuthBloc authBloc = context.read<AuthBloc>();
-
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
-          child: Column(
-            children: [
-              const Spacer(
-                flex: 2,
-              ),
-              Image.asset(
-                "assets/icons/chat-logo.png",
-                width: 146,
-                fit: BoxFit.contain,
-              ),
-              const Spacer(),
-              PrimaryButton(
-                color: const Color(0xFF6485E6),
-                text: 'Login with Google',
-                press: () {
-                  authBloc.add(AppStarted());
-                  // _signIn();
-                  const Duration(seconds: 2);
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ChatsPage()));
-                },
-              ),
-              const SizedBox(
-                height: kDefaultPadding * 1.5,
-              ),
-              PrimaryButton(
-                color: const Color(0xFFB36AE8),
-                text: 'Sign Up',
-                press: () {},
-              ),
-              const Spacer(
-                flex: 2,
-              ),
-            ],
+          child: BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if(state is Authenticated){
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ChatsPage(displayName: state.displayName.toString(),)));
+              }
+            },
+            child: Column(
+              children: [
+                const Spacer(
+                  flex: 2,
+                ),
+                Image.asset(
+                  "assets/icons/chat-logo.png",
+                  width: 146,
+                  fit: BoxFit.contain,
+                ),
+                const Spacer(),
+                PrimaryButton(
+                  color: const Color(0xFF6485E6),
+                  text: 'Login with Google',
+                  press: () {
+                    authBloc.add(LoggedIn());
+                  },
+                ),
+                const SizedBox(
+                  height: kDefaultPadding * 1.5,
+                ),
+                PrimaryButton(
+                  color: const Color(0xFFB36AE8),
+                  text: 'Sign Up',
+                  press: () {},
+                ),
+                const Spacer(
+                  flex: 2,
+                ),
+              ],
+            ),
           ),
         ),
       ),

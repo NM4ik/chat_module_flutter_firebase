@@ -1,6 +1,8 @@
+import 'package:chat_flutter/bloc/auth/auth_bloc.dart';
 import 'package:chat_flutter/constants.dart';
 import 'package:chat_flutter/ui/components/filled_outline_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'chat_card.dart';
 
@@ -40,7 +42,7 @@ class _ChatsBodyState extends State<ChatsBody> {
                   width: kDefaultPadding,
                 ),
                 FillOutlineButton(
-                    text: "Active", press: () {}, isFilled: isSecondButton)
+                    text: "Active", press: () {}, isFilled: isSecondButton),
               ],
             ),
           ),
@@ -48,7 +50,7 @@ class _ChatsBodyState extends State<ChatsBody> {
         Expanded(
             child: ListView.builder(
           itemCount: 10,
-          itemBuilder: (context, index) => ChatCard(),
+          itemBuilder: (context, index) => const ChatCard(),
         )),
       ],
     );

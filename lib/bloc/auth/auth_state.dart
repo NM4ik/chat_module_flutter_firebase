@@ -11,7 +11,7 @@ class Uninitialized extends AuthState {
 }
 
 class Authenticated extends AuthState{
-  final String displayName;
+  final String? displayName;
 
   Authenticated(this.displayName);
 
