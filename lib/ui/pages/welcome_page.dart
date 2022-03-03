@@ -1,5 +1,5 @@
 import 'package:chat_flutter/constants.dart';
-import 'package:chat_flutter/ui/pages/in_or_out_page.dart';
+import 'package:chat_flutter/ui/pages/authenticated_page.dart';
 import 'package:flutter/material.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -35,7 +35,7 @@ class WelcomePage extends StatelessWidget {
             ),
             const Spacer(flex: 3,),
             FittedBox(
-              child: TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const InOrOutPage())), child: Row(children: [
+              child: TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AuthenticatedPage())), child: Row(children: [
                 Text("Skip", style: Theme
                     .of(context)
                     .textTheme

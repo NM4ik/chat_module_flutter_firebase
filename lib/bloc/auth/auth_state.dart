@@ -10,7 +10,7 @@ class Uninitialized extends AuthState {
   String toString() => 'Uninitialized';
 }
 
-class Authenticated extends AuthState{
+class Authenticated extends AuthState {
   final String? displayName;
 
   Authenticated(this.displayName);
@@ -19,7 +19,7 @@ class Authenticated extends AuthState{
   String toString() => 'Authenticated { displayName: $displayName }';
 }
 
-class Unauthenticated extends AuthState{
+class Unauthenticated extends AuthState {
   @override
   String toString() => 'Unauthenticated';
 }

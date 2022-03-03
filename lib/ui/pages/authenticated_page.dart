@@ -6,28 +6,18 @@ import 'package:chat_flutter/data/auth/android_auth_provider.dart';
 import 'package:chat_flutter/data/auth/auth_provider.dart';
 import 'package:chat_flutter/ui/components/primary_button.dart';
 import 'package:chat_flutter/ui/pages/chats_page.dart';
+import 'package:chat_flutter/ui/pages/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class InOrOutPage extends StatefulWidget {
-  const InOrOutPage({Key? key}) : super(key: key);
+class AuthenticatedPage extends StatefulWidget {
+  const AuthenticatedPage({Key? key}) : super(key: key);
 
   @override
-  State<InOrOutPage> createState() => _InOrOutPageState();
+  State<AuthenticatedPage> createState() => _AuthenticatedPageState();
 }
 
-class _InOrOutPageState extends State<InOrOutPage> {
-  // void _signIn() async {
-  //   try {
-  //     final creds = await AndroidAuthProvider().singInWithGoogle();
-  //     print('USER : !!! ${creds.user}');
-  //     setState(() {
-  //       _signedIn = true;
-  //     });
-  //   } catch (e) {
-  //     print('Login failed: $e');
-  //   }
-  // }
+class _AuthenticatedPageState extends State<AuthenticatedPage> {
   @override
   Widget build(BuildContext context) {
     final AuthBloc authBloc = context.read<AuthBloc>();
@@ -37,9 +27,18 @@ class _InOrOutPageState extends State<InOrOutPage> {
           padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
           child: BlocListener<AuthBloc, AuthState>(
             listener: (context, state) {
-              if(state is Authenticated){
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ChatsPage(displayName: state.displayName.toString(),)));
+              if(state is Uninitialized){
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SplashPage()));
+              }else if (state is Authenticated) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChatsPage(
+                              displayName: state.displayName.toString(),
+                            )));
               }
             },
             child: Column(
@@ -57,17 +56,21 @@ class _InOrOutPageState extends State<InOrOutPage> {
                   color: const Color(0xFF6485E6),
                   text: 'Login with Google',
                   press: () {
-                    authBloc.add(LoggedIn());
+                    authBloc.add(AuthenticationLoggedIn());
                   },
                 ),
                 const SizedBox(
                   height: kDefaultPadding * 1.5,
                 ),
-                PrimaryButton(
-                  color: const Color(0xFFB36AE8),
-                  text: 'Sign Up',
-                  press: () {},
-                ),
+                // PrimaryButton(
+                //   color: const Color(0xFFB36AE8),
+                //   text: 'Sign Up',
+                //   press: () async {
+                //     final creds =
+                //         await AndroidAuthProvider().singInWithGoogle();
+                //     print(creds.user?.displayName);
+                //   },
+                // ),
                 const Spacer(
                   flex: 2,
                 ),

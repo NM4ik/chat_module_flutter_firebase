@@ -5,17 +5,19 @@ abstract class AuthEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class AppStarted extends AuthEvent{
+class AuthenticatedStarted extends AuthEvent{
   @override
   String toString() => 'AppStarted';
 }
 
-class LoggedIn extends AuthEvent{
+class AuthenticationLoggedIn extends AuthEvent{
   @override
   String toString() => 'LoggedIn';
 }
 
-class LoggedOut extends AuthEvent{
+class AuthenticationLoggedOut extends AuthEvent{
   @override
   String toString() => 'LoggedOut';
 }
+
+class AuthenticatedError extends AuthEvent{}

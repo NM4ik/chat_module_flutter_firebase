@@ -2,7 +2,8 @@ import 'package:chat_flutter/bloc/auth/auth_bloc.dart';
 import 'package:chat_flutter/data/auth/auth_provider.dart';
 import 'package:chat_flutter/data/local_data/shared_preferences.dart';
 import 'package:chat_flutter/ui/pages/chats_page.dart';
-import 'package:chat_flutter/ui/pages/in_or_out_page.dart';
+import 'package:chat_flutter/ui/pages/authenticated_page.dart';
+import 'package:chat_flutter/ui/pages/splash_page.dart';
 import 'package:chat_flutter/ui/pages/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(
             create: (context) =>
                 AuthBloc(androidAuthProvider: AndroidAuthProvider())
-                  ..add(AppStarted())),
+                  ..add(AuthenticatedStarted())),
       ],
       child: MaterialApp(
           title: 'Flutter Chat Module',
@@ -36,19 +37,18 @@ class MyApp extends StatelessWidget {
           home: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
               print(state.toString());
-              if (state is AppStarted) {
+              if (state is AuthenticatedStarted) {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
               } else if (state is Authenticated) {
-                return ChatsPage(displayName: state.displayName.toString(),);
+                return ChatsPage(
+                  displayName: state.displayName.toString(),
+                );
               } else if (state is Unauthenticated) {
-                // if (getFirstStatus.getStatusFromSharedPreferences()) {
-                //   return const InOrOutPage();
-                // } else {
-                //   return const WelcomePage();
-                // }
-                return const WelcomePage();
+                return const AuthenticatedPage();
+              } else if (state is Uninitialized){
+                return const SplashPage();
               }
               return const Text('что-то пошло не так..');
             },

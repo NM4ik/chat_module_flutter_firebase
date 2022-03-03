@@ -1,11 +1,13 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:chat_flutter/data/auth/android_auth_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-import '../../ui/pages/in_or_out_page.dart';
+import '../../ui/pages/authenticated_page.dart';
 
 part 'auth_event.dart';
 
@@ -15,41 +17,43 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AndroidAuthProvider androidAuthProvider;
 
   AuthBloc({required this.androidAuthProvider}) : super(Uninitialized()) {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+
     on<AuthEvent>((event, emit) async {
-      // if (event is AppStarted) {
-      //   _appStarterToState(emit);
-      // } else if (event is LoggedIn) {
-      //   _appLoggedInToState(emit);
-      // } else if (event is LoggedIn) {
-      //   _appLoggedOutToState(emit);
-      // }
-
-      if (event is AppStarted) {
+      if (event is AuthenticatedStarted) {
         emit(Uninitialized());
-
-        final isSignedIn = await androidAuthProvider.isSignedIn();
-        print(isSignedIn);
+        bool isSignedIn;
+        try {
+          isSignedIn = await androidAuthProvider.isSignedIn();
+        } catch (e) {
+          isSignedIn = false;
+        }
+        log('Signed or not:  ${isSignedIn.toString()}');
         if (isSignedIn) {
           final name = await androidAuthProvider.getUser();
           emit(Authenticated(name!));
         } else {
           emit(Unauthenticated());
         }
-      }
-
-      if (event is LoggedOut) {
+      } else if (event is AuthenticationLoggedOut) {
         emit(Unauthenticated());
         androidAuthProvider.signOut();
-
-        // MaterialPageRoute(builder: (BuildContext context) {
-        //   return const InOrOutPage();
-        // });
-      }
-
-      if (event is LoggedIn) {
+      } else if (event is AuthenticationLoggedIn) {
         try {
+          emit(Uninitialized());
           final credentials = await AndroidAuthProvider().singInWithGoogle();
-          print('USER : !!! ${credentials.user}');
+
+          // users
+          //     .add({'email': credentials.user?.displayName.toString(), 'name': credentials.user?.email.toString()})
+          //     .then((value) => print("User Added"))
+          //     .catchError((error) => print("Failed to add user: $error"));
+          // добавление пользователя.
+
+          final data = await users.get();
+          final allData = data.docs.map((e) => e.data()).toList();
+          print(allData);
+
+          log('USER : !!! ${credentials.user?.email}');
           emit(Authenticated(credentials.user?.displayName));
         } catch (_) {
           emit(Unauthenticated());
@@ -57,29 +61,4 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
   }
-//
-// _appStarterToState(emit) async {
-//   try {
-//     final isSignedIn = await androidAuthProvider.isSignedIn();
-//     if (isSignedIn) {
-//       final name = await androidAuthProvider.getUser();
-//       emit(Authenticated(name!));
-//     } else {
-//       emit(Unauthenticated());
-//     }
-//   } catch (_) {
-//     emit(Unauthenticated());
-//   }
-// }
-//
-// _appLoggedInToState(emit) async {
-//   final String? displayName = await androidAuthProvider.getUser();
-//
-//   emit(Authenticated(displayName!));
-// }
-//
-// _appLoggedOutToState(emit) async {
-//   emit(Unauthenticated());
-//   androidAuthProvider.signOut();
-// }
 }
