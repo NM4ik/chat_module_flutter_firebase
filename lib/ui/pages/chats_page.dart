@@ -3,18 +3,18 @@ import 'dart:developer';
 import 'package:chat_flutter/bloc/auth/auth_bloc.dart';
 import 'package:chat_flutter/ui/components/chats_body.dart';
 import 'package:chat_flutter/ui/pages/authenticated_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../components/filled_outline_button.dart';
-
 class ChatsPage extends StatelessWidget {
-  const ChatsPage({Key? key, required this.displayName}) : super(key: key);
-  final String displayName;
+  const ChatsPage({Key? key, required this.user}) : super(key: key);
+  final UserCredential user;
 
   @override
   Widget build(BuildContext context) {
-    final AuthBloc authBloc = context.read<AuthBloc>();
+    final authBloc = context.read<AuthBloc>();
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -24,29 +24,33 @@ class ChatsPage extends StatelessWidget {
           actions: [
             BlocConsumer<AuthBloc, AuthState>(
               listener: (context, state) {
-                if (state is Authenticated) {
-                  log('request test');
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   SnackBar(
-                  //     backgroundColor: Colors.green,
-                  //     content: Text('Success'),
-                  //   ),
-                  // );
-                } else if (state is Unauthenticated) {
-                  // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  //     content: Text('Logged Out: $displayName'),
-                  //     backgroundColor: const Color(0xFFAC83F0)));
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AuthenticatedPage()));
+                if (state is Unauthenticated) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('Logged Out: ${user.user!.email}'), backgroundColor: const Color(0xFFAC83F0)));
+                  // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const AuthenticatedPage()));
+                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const AuthenticatedPage()), (route) => false);
                 }
+
+                /**
+                 *  fix this.
+                 *  when the state is authenticated this condition isn't triggered
+                 *
+                 *  if (state is Authenticated) {
+                    log('request test');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                    backgroundColor: Colors.green,
+                    content: Text('Success'),
+                    ),
+                    );
+                    }
+                 */
               },
               builder: (context, state) {
+                log('${state.runtimeType}', name: 'state type');
                 return Row(
                   children: [
-                    IconButton(
-                        onPressed: () {}, icon: const Icon(Icons.search)),
+                    IconButton(onPressed: () async {}, icon: const Icon(Icons.search)),
                     IconButton(
                         onPressed: () {
                           authBloc.add(AuthenticationLoggedOut());
@@ -66,7 +70,7 @@ class ChatsPage extends StatelessWidget {
           ),
           elevation: 0,
         ),
-        body: ChatsBody(name: displayName),
+        body: ChatsBody(name: user.user!.email.toString()),
       ),
     );
   }

@@ -26,10 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-            create: (context) =>
-                AuthBloc(androidAuthProvider: AndroidAuthProvider())
-                  ..add(AuthenticatedStarted())),
+        BlocProvider(create: (context) => AuthBloc(androidAuthProvider: AndroidAuthProvider())..add(AuthenticatedStarted())),
       ],
       child: MaterialApp(
           title: 'Flutter Chat Module',
@@ -43,11 +40,11 @@ class MyApp extends StatelessWidget {
                 );
               } else if (state is Authenticated) {
                 return ChatsPage(
-                  displayName: state.displayName.toString(),
+                  user: state.user,
                 );
               } else if (state is Unauthenticated) {
                 return const AuthenticatedPage();
-              } else if (state is Uninitialized){
+              } else if (state is Uninitialized) {
                 return const SplashPage();
               }
               return const Text('что-то пошло не так..');

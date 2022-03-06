@@ -27,18 +27,15 @@ class _AuthenticatedPageState extends State<AuthenticatedPage> {
           padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
           child: BlocListener<AuthBloc, AuthState>(
             listener: (context, state) {
-              if(state is Uninitialized){
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SplashPage()));
-              }else if (state is Authenticated) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ChatsPage(
-                              displayName: state.displayName.toString(),
-                            )));
+              if (state is Uninitialized) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => SplashPage()),
+                );
+              } else if (state is Authenticated) {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => ChatsPage(
+                          user: state.user,
+                        )));
               }
             },
             child: Column(

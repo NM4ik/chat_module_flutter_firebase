@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:chat_flutter/data/auth/android_auth_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../ui/pages/authenticated_page.dart';
@@ -15,50 +16,76 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AndroidAuthProvider androidAuthProvider;
+  CollectionReference users = FirebaseFirestore.instance.collection('users');
 
   AuthBloc({required this.androidAuthProvider}) : super(Uninitialized()) {
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    on<AuthenticatedStarted>(_onAuthStarted);
+    on<AuthenticationLoggedIn>(_onAuthLoggedIn);
+    on<AuthenticationLoggedOut>(_onAuthLoggedOut);
+  }
 
-    on<AuthEvent>((event, emit) async {
-      if (event is AuthenticatedStarted) {
-        emit(Uninitialized());
-        bool isSignedIn;
-        try {
-          isSignedIn = await androidAuthProvider.isSignedIn();
-        } catch (e) {
-          isSignedIn = false;
-        }
-        log('Signed or not:  ${isSignedIn.toString()}');
-        if (isSignedIn) {
-          final name = await androidAuthProvider.getUser();
-          emit(Authenticated(name!));
-        } else {
-          emit(Unauthenticated());
-        }
-      } else if (event is AuthenticationLoggedOut) {
-        emit(Unauthenticated());
-        androidAuthProvider.signOut();
-      } else if (event is AuthenticationLoggedIn) {
-        try {
-          emit(Uninitialized());
-          final credentials = await AndroidAuthProvider().singInWithGoogle();
+  void _onAuthStarted(AuthenticatedStarted event, Emitter<AuthState> emit) async {
+    emit(Uninitialized());
+    bool isSignedIn;
+    try {
+      isSignedIn = await androidAuthProvider.isSignedIn();
+    } catch (e) {
+      isSignedIn = false;
+    }
+    log('Signed or not:  ${isSignedIn.toString()}');
+    if (isSignedIn) {
+      final user = await _getUserCredentials();
+      emit(Authenticated(user));
+    } else {
+      emit(Unauthenticated());
+    }
+  }
 
-          // users
-          //     .add({'email': credentials.user?.displayName.toString(), 'name': credentials.user?.email.toString()})
-          //     .then((value) => print("User Added"))
-          //     .catchError((error) => print("Failed to add user: $error"));
-          // добавление пользователя.
+  FutureOr<void> _onAuthLoggedIn(AuthenticationLoggedIn event, Emitter<AuthState> emit) async {
+    try {
+      emit(Uninitialized());
+      final user = await _getUserCredentials();
 
-          final data = await users.get();
-          final allData = data.docs.map((e) => e.data()).toList();
-          print(allData);
+      _addUserToCollection(user.user);
+      emit(Authenticated(user));
+    } catch (_) {
+      emit(Unauthenticated());
+    }
+  }
 
-          log('USER : !!! ${credentials.user?.email}');
-          emit(Authenticated(credentials.user?.displayName));
-        } catch (_) {
-          emit(Unauthenticated());
-        }
+  FutureOr<void> _onAuthLoggedOut(AuthenticationLoggedOut event, Emitter<AuthState> emit) async {
+    emit(Unauthenticated());
+    androidAuthProvider.signOut();
+  }
+
+  void _addUserToCollection(User? user) async {
+    try {
+      final dataExists = await users.doc(user!.uid).get();
+
+      if (dataExists.exists) {
+        log('user already added', name: "UserToFireBase");
+        return null;
+      } else {
+        users.doc(user.uid).set({
+          "email": user.email,
+          "name": user.displayName,
+          "phone": user.phoneNumber,
+        });
+        log('user was added', name: "UserToFireBase");
       }
-    });
+    } catch (e) {
+      print('Error from _addUserToCollection - $e');
+    }
+  }
+
+  Future<UserCredential> _getUserCredentials() async{
+    final credentials = await AndroidAuthProvider().singInWithGoogle();
+    return credentials;
   }
 }
+
+// users
+//     .add({'email': credentials.user?.displayName.toString(), 'name': credentials.user?.email.toString()})
+//     .then((value) => print("User Added"))
+//     .catchError((error) => print("Failed to add user: $error"));
+// добавление пользователя.

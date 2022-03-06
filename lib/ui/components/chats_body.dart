@@ -35,7 +35,7 @@ class _ChatsBodyState extends State<ChatsBody> {
             child: Row(
               children: [
                 FillOutlineButton(
-                    text: "Recent Message ${widget.name}",
+                    text: "name: ${widget.name}",
                     press: () {},
                     isFilled: isFirstButton),
                 const SizedBox(
