@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:chat_flutter/bloc/auth/auth_bloc.dart';
+import 'package:chat_flutter/data/database/firestore/firestore_methods.dart';
 import 'package:chat_flutter/ui/components/chats_body.dart';
 import 'package:chat_flutter/ui/pages/authenticated_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,8 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChatsPage extends StatelessWidget {
-  const ChatsPage({Key? key, required this.user}) : super(key: key);
+  ChatsPage({Key? key, required this.user}) : super(key: key);
   final UserCredential user;
+  FireStoreMethods fireStoreMethods = FireStoreMethods();
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +52,9 @@ class ChatsPage extends StatelessWidget {
                 log('${state.runtimeType}', name: 'state type');
                 return Row(
                   children: [
-                    IconButton(onPressed: () async {}, icon: const Icon(Icons.search)),
+                    IconButton(onPressed: () async {
+                      fireStoreMethods.getRooms();
+                    }, icon: const Icon(Icons.search)),
                     IconButton(
                         onPressed: () {
                           authBloc.add(AuthenticationLoggedOut());

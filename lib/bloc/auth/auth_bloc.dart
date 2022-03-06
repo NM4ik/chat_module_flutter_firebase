@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
-import 'package:chat_flutter/data/auth/android_auth_provider.dart';
+import 'package:chat_flutter/data/database/auth/android_auth_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -78,14 +78,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<UserCredential> _getUserCredentials() async{
+  Future<UserCredential> _getUserCredentials() async {
     final credentials = await AndroidAuthProvider().singInWithGoogle();
     return credentials;
   }
 }
-
-// users
-//     .add({'email': credentials.user?.displayName.toString(), 'name': credentials.user?.email.toString()})
-//     .then((value) => print("User Added"))
-//     .catchError((error) => print("Failed to add user: $error"));
-// добавление пользователя.

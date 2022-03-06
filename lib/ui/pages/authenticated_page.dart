@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:chat_flutter/bloc/auth/auth_bloc.dart';
 import 'package:chat_flutter/constants.dart';
-import 'package:chat_flutter/data/auth/android_auth_provider.dart';
-import 'package:chat_flutter/data/auth/auth_provider.dart';
+import 'package:chat_flutter/data/database/auth/android_auth_provider.dart';
+import 'package:chat_flutter/data/database/auth/auth_provider.dart';
 import 'package:chat_flutter/ui/components/primary_button.dart';
 import 'package:chat_flutter/ui/pages/chats_page.dart';
 import 'package:chat_flutter/ui/pages/splash_page.dart';

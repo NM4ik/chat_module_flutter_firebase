@@ -1,6 +1,6 @@
 import 'package:chat_flutter/bloc/auth/auth_bloc.dart';
-import 'package:chat_flutter/data/auth/auth_provider.dart';
-import 'package:chat_flutter/data/local_data/shared_preferences.dart';
+import 'package:chat_flutter/data/database/auth/auth_provider.dart';
+import 'package:chat_flutter/data/database/local_data/shared_preferences.dart';
 import 'package:chat_flutter/ui/pages/chats_page.dart';
 import 'package:chat_flutter/ui/pages/authenticated_page.dart';
 import 'package:chat_flutter/ui/pages/splash_page.dart';
@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'bloc/app_bloc_observer.dart';
-import 'data/auth/android_auth_provider.dart';
+import 'data/database/auth/android_auth_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
