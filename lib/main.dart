@@ -1,5 +1,7 @@
 import 'package:chat_flutter/bloc/auth/auth_bloc.dart';
+import 'package:chat_flutter/bloc/chat/chats_cubit.dart';
 import 'package:chat_flutter/data/database/auth/auth_provider.dart';
+import 'package:chat_flutter/data/database/firestore/firestore_methods.dart';
 import 'package:chat_flutter/data/database/local_data/shared_preferences.dart';
 import 'package:chat_flutter/ui/pages/chats_page.dart';
 import 'package:chat_flutter/ui/pages/authenticated_page.dart';
@@ -20,6 +22,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
   GetFirstStatus getFirstStatus = GetFirstStatus();
+  FireStoreMethods fireStoreMethods = FireStoreMethods();
 
   // This widget is the root of your application.
   @override
@@ -27,6 +30,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => AuthBloc(androidAuthProvider: AndroidAuthProvider())..add(AuthenticatedStarted())),
+        BlocProvider(create: (context) => ChatsCubit(fireStoreMethods)),
       ],
       child: MaterialApp(
           title: 'Flutter Chat Module',

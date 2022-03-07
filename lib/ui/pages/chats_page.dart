@@ -53,7 +53,7 @@ class ChatsPage extends StatelessWidget {
                 return Row(
                   children: [
                     IconButton(onPressed: () async {
-                      fireStoreMethods.getRooms();
+                      // fireStoreMethods.getRoomsByUser();
                     }, icon: const Icon(Icons.search)),
                     IconButton(
                         onPressed: () {
@@ -74,7 +74,7 @@ class ChatsPage extends StatelessWidget {
           ),
           elevation: 0,
         ),
-        body: ChatsBody(name: user.user!.email.toString()),
+        body: ChatsBody(userID: user.user!.uid,),
       ),
     );
   }
