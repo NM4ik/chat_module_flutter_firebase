@@ -18,7 +18,7 @@ class FillOutlineButton extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-            fontSize: 12, color: isFilled ? Colors.black : Colors.white),
+            fontSize: 12, color: isFilled ? Colors.black : Colors.white, fontFamily: 'SF', fontWeight: FontWeight.w500),
       ),
       style: ElevatedButton.styleFrom(
         elevation: 0,

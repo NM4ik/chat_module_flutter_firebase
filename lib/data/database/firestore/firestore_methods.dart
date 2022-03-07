@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:chat_flutter/data/entity/chat_room.dart';
 import 'package:chat_flutter/data/entity/message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 
 class FireStoreMethods {
   // CollectionReference rooms = FirebaseFirestore.instance.collection('chatRooms').doc('OQewp4DKL2q6x9EqJPLV').collection('messages');
@@ -16,7 +19,6 @@ class FireStoreMethods {
     List<ChatRoom> chatRooms = [];
     var t = await rooms.where("users", arrayContains: userID).get();
     t.docs.map((e) => chatRooms.add(ChatRoom.fromJson(e.data() as Map<String, dynamic>))).toList();
-    print(chatRooms);
     return chatRooms;
   }
 

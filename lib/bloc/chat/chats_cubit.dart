@@ -10,16 +10,34 @@ class ChatsCubit extends Cubit<ChatsState> {
 
   ChatsCubit(this.fireStoreMethods) : super(ChatsEmptyState());
 
-
-  void loadChats(String userID) async {
+  Future<List<ChatRoom>> loadChats(String userID) async {
+    List<ChatRoom> chatsRooms = [];
     try {
       emit(ChatsLoadingState());
-      final chatsRooms = await fireStoreMethods.getRoomsByUser(userID);
-      print(chatsRooms.length);
+      chatsRooms = await fireStoreMethods.getRoomsByUser(userID);
+
       if (chatsRooms.isEmpty) {
         emit(ChatsEmptyState());
-      }else if (chatsRooms.isNotEmpty) {
+      } else if (chatsRooms.isNotEmpty) {
         emit(ChatsLoadedState(chatsRooms));
+        return chatsRooms;
+      }
+    } catch (e) {
+      emit(ChatsErrorState(e.toString()));
+    }
+    return chatsRooms;
+  }
+
+  Stream<List<ChatRoom>> getStreamChats(String userID) => Stream.periodic(const Duration(seconds: 3)).asyncMap((_) => updateChats(userID));
+
+  updateChats(String userID) async {
+    try {
+      final chatsRooms = await fireStoreMethods.getRoomsByUser(userID);
+      if (chatsRooms.isEmpty) {
+        emit(ChatsEmptyState());
+      } else if (chatsRooms.isNotEmpty) {
+        emit(ChatsLoadedState(chatsRooms));
+        return chatsRooms;
       }
     } catch (e) {
       emit(ChatsErrorState(e.toString()));

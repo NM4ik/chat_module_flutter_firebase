@@ -14,57 +14,64 @@ class ChatCard extends StatelessWidget {
       onTap: () {},
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding, vertical: kDefaultPadding * 0.75),
-        child: Row(
+        child: Column(
           children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), border: Border.all(color: const Color(0xFFAC83F0), width: 2), ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10000.0),
-                child: CachedNetworkImage(
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
                   width: 50,
                   height: 50,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), border: Border.all(color: const Color(0xFFAC83F0), width: 2), ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10000.0),
+                    child: CachedNetworkImage(
+                      width: 50,
+                      height: 50,
 
-                  imageUrl: 'https://sun9-47.userapi.com/impf/c852128/v852128674/193b6e/Uy7BDEgRaLE.jpg?size=2048x1999&quality=96&sign=0c1a3a26d3bf367aa97ed347a0b816d6&type=album',
-                  placeholder: (context, url) => const CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                      imageUrl: 'https://sun9-47.userapi.com/impf/c852128/v852128674/193b6e/Uy7BDEgRaLE.jpg?size=2048x1999&quality=96&sign=0c1a3a26d3bf367aa97ed347a0b816d6&type=album',
+                      placeholder: (context, url) => const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Expanded(
-                child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    chatRoom.name,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                Expanded(
+                    child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        chatRoom.name,
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, fontFamily: 'SF'),
+                      ),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      Opacity(
+                          opacity: 0.64,
+                          child: chatRoom.chatLastMessage!.isNotEmpty
+                              ? Text(
+                                  '${chatRoom.chatLastMessage}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                      fontWeight: FontWeight.w600, fontFamily: 'SF'
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )
+                              : const Text("no messages")),
+                    ],
                   ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Opacity(
-                      opacity: 0.64,
-                      child: chatRoom.chatLastMessage!.isNotEmpty
-                          ? Text(
-                              '${chatRoom.chatLastMessage}',
-                              style: TextStyle(
-                                fontSize: 12,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            )
-                          : const Text("no messages")),
-                ],
-              ),
-            )),
-            Opacity(
-              opacity: 0.64,
-              // child: Text('${DateTime.now().hour.toString()} hours'),
-              child: Text(chatRoom.lastMessageTime.toString()),
+                )),
+                Opacity(
+                  opacity: 0.64,
+                  // child: Text('${DateTime.now().hour.toString()} hours'),
+                  child: Text(chatRoom.lastMessageTime.toString(), style: TextStyle(fontFamily: 'SF', fontWeight: FontWeight.w500, fontSize: 15),),
+                ),
+              ],
             ),
+            Divider(color: Color(0xFFA4AFCF), height: 40),
           ],
         ),
       ),

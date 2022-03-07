@@ -22,7 +22,7 @@ class ChatsPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: const Text("Chats"),
+          title: const Text("Chats", style: TextStyle(fontFamily: 'SF', fontWeight: FontWeight.w600, fontSize: 24),),
           actions: [
             BlocConsumer<AuthBloc, AuthState>(
               listener: (context, state) {

@@ -53,12 +53,17 @@ class _ChatsBodyState extends State<ChatsBody> {
 
         return Column(
           children: [
-            ChatsBodyHeaderWidget(),
-            Expanded(
-                child: ListView.builder(
-              itemCount: chats.length,
-              itemBuilder: (context, index) => ChatCard(chatRoom: chats[index],),
-            )),
+            const ChatsBodyHeaderWidget(),
+            StreamBuilder<List<ChatRoom>>(
+              stream: context.read<ChatsCubit>().getStreamChats(widget.userID),
+              builder: (context, snapshot) {
+                return Expanded(
+                    child: ListView.builder(
+                  itemCount: chats.length,
+                  itemBuilder: (context, index) => ChatCard(chatRoom: chats[index],),
+                ));
+              }
+            ),
           ],
         );
       },
