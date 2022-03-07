@@ -1,4 +1,5 @@
 import 'package:chat_flutter/data/entity/chat_room.dart';
+import 'package:chat_flutter/data/entity/message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FireStoreMethods {
@@ -15,8 +16,23 @@ class FireStoreMethods {
     List<ChatRoom> chatRooms = [];
     var t = await rooms.where("users", arrayContains: userID).get();
     t.docs.map((e) => chatRooms.add(ChatRoom.fromJson(e.data() as Map<String, dynamic>))).toList();
+    print(chatRooms);
     return chatRooms;
   }
+
+  // Future<Stream<List<ChatRoom>>> getChatRooms(String userID) async {
+  //   dynamic rooms = await getRoomsByUser(userID);
+  //   return rooms;
+  // }
+
+/**
+ * Why "get" last message? i Think need when message push to messages push last message to chatRoom['lastMessage']
+ */
+/* Future<Message> getLastMessage(CollectionReference rooms, String roomId) async{
+    var messages = await rooms.doc(roomId).collection('messages').get();
+    var lastMessage = Message.fromJson(messages.docs.last as Map<String, dynamic>);
+    return lastMessage;
+  }*/
 
 //
 // Future<List<dynamic>> getChatsForUser(String uid){

@@ -1,8 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_flutter/constants.dart';
+import 'package:chat_flutter/data/entity/chat_room.dart';
 import 'package:flutter/material.dart';
 
 class ChatCard extends StatelessWidget {
-  const ChatCard({Key? key}) : super(key: key);
+  ChatRoom chatRoom;
+
+  ChatCard({Key? key, required this.chatRoom}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,25 +16,54 @@ class ChatCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding, vertical: kDefaultPadding * 0.75),
         child: Row(
           children: [
-            const CircleAvatar(
-              // backgroundImage: ,
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), border: Border.all(color: const Color(0xFFAC83F0), width: 2), ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10000.0),
+                child: CachedNetworkImage(
+                  width: 50,
+                  height: 50,
+
+                  imageUrl: 'https://sun9-47.userapi.com/impf/c852128/v852128674/193b6e/Uy7BDEgRaLE.jpg?size=2048x1999&quality=96&sign=0c1a3a26d3bf367aa97ed347a0b816d6&type=album',
+                  placeholder: (context, url) => const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                ),
+              ),
             ),
-            Expanded(child: Padding(
+            Expanded(
+                child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text("Test Chat", style: TextStyle(fontSize: 15,  fontWeight: FontWeight.w500),),
-                  SizedBox(height: 8,),
-                  Opacity(opacity: 0.64 ,child: Text("Do u have update....Do u have update....Do u", style: TextStyle(fontSize: 12,), maxLines: 1, overflow: TextOverflow.ellipsis,)),
+                children: [
+                  Text(
+                    chatRoom.name,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Opacity(
+                      opacity: 0.64,
+                      child: chatRoom.chatLastMessage!.isNotEmpty
+                          ? Text(
+                              '${chatRoom.chatLastMessage}',
+                              style: TextStyle(
+                                fontSize: 12,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )
+                          : const Text("no messages")),
                 ],
               ),
             )),
-
             Opacity(
               opacity: 0.64,
-              child: Text(
-                '${DateTime.now().hour.toString()} hours'),
+              // child: Text('${DateTime.now().hour.toString()} hours'),
+              child: Text(chatRoom.lastMessageTime.toString()),
             ),
           ],
         ),

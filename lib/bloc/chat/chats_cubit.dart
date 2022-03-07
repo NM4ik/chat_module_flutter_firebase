@@ -10,6 +10,7 @@ class ChatsCubit extends Cubit<ChatsState> {
 
   ChatsCubit(this.fireStoreMethods) : super(ChatsEmptyState());
 
+
   void loadChats(String userID) async {
     try {
       emit(ChatsLoadingState());
