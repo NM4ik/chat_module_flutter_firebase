@@ -27,24 +27,23 @@ class _ChatsBodyState extends State<ChatsBody> {
 
     return BlocBuilder<ChatsCubit, ChatsState>(
       builder: (context, state) {
-        print(widget.userID);
         List<ChatRoom> chats = [];
 
         if (state is ChatsLoadingState) {
           log('loading', name: 'state');
-          return CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         } else if (state is ChatsLoadedState) {
           log('loaded', name: 'state');
           chats = state.chatRooms;
         } else if (state is ChatsErrorState) {
-          log('error', name: 'state');
+          log('error ${state.message}', name: 'state');
           return Text(
             state.message,
             style: const TextStyle(color: Colors.white, fontSize: 25),
           );
         } else if (state is ChatsEmptyState) {
           log('empty', name: 'state');
-          return ChatsBodyHeaderWidget(
+          return const ChatsBodyHeaderWidget(
             text: "You don't have active chats",
           );
         }
@@ -55,15 +54,16 @@ class _ChatsBodyState extends State<ChatsBody> {
           children: [
             const ChatsBodyHeaderWidget(),
             StreamBuilder<List<ChatRoom>>(
-              stream: context.read<ChatsCubit>().getStreamChats(widget.userID),
-              builder: (context, snapshot) {
-                return Expanded(
-                    child: ListView.builder(
-                  itemCount: chats.length,
-                  itemBuilder: (context, index) => ChatCard(chatRoom: chats[index],),
-                ));
-              }
-            ),
+                stream: context.read<ChatsCubit>().getStreamChats(widget.userID),
+                builder: (context, snapshot) {
+                  return Expanded(
+                      child: ListView.builder(
+                    itemCount: chats.length,
+                    itemBuilder: (context, index) => ChatCard(
+                      chatRoom: chats[index],
+                    ),
+                  ));
+                }),
           ],
         );
       },
