@@ -5,14 +5,15 @@ import 'package:chat_flutter/constants.dart';
 import 'package:chat_flutter/data/entity/chat_room.dart';
 import 'package:chat_flutter/ui/components/filled_outline_button.dart';
 import 'package:chat_flutter/ui/widgets/chats_body_header_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'chat_card.dart';
 
 class ChatsBody extends StatefulWidget {
-  const ChatsBody({Key? key, required this.userID}) : super(key: key);
-  final String userID;
+  const ChatsBody({Key? key, required this.user}) : super(key: key);
+  final UserCredential user;
 
   @override
   State<ChatsBody> createState() => _ChatsBodyState();
@@ -23,10 +24,11 @@ class _ChatsBodyState extends State<ChatsBody> {
   Widget build(BuildContext context) {
     bool isFirstButton = true;
     bool isSecondButton = false;
-    context.read<ChatsCubit>().loadChats(widget.userID);
+    context.read<ChatsCubit>().loadChats(widget.user.user!.uid.toString());
 
     return BlocBuilder<ChatsCubit, ChatsState>(
       builder: (context, state) {
+
         List<ChatRoom> chats = [];
 
         if (state is ChatsLoadingState) {
@@ -54,13 +56,14 @@ class _ChatsBodyState extends State<ChatsBody> {
           children: [
             const ChatsBodyHeaderWidget(),
             StreamBuilder<List<ChatRoom>>(
-                stream: context.read<ChatsCubit>().getStreamChats(widget.userID),
+                stream: context.read<ChatsCubit>().getStreamChats(widget.user.user!.uid),
                 builder: (context, snapshot) {
                   return Expanded(
                       child: ListView.builder(
                     itemCount: chats.length,
                     itemBuilder: (context, index) => ChatCard(
                       chatRoom: chats[index],
+                      user: widget.user,
                     ),
                   ));
                 }),

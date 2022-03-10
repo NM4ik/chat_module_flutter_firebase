@@ -1,97 +1,197 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chat_flutter/bloc/auth/auth_bloc.dart';
+import 'package:chat_flutter/bloc/chat/chats_cubit.dart';
+import 'package:chat_flutter/data/database/auth/android_auth_provider.dart';
 import 'package:chat_flutter/data/database/firestore/firestore_methods.dart';
+import 'package:chat_flutter/data/entity/message.dart';
 import 'package:chat_flutter/ui/pages/chats_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+
+import '../../bloc/conversation/conversation_bloc.dart';
 
 class ConversationPage extends StatelessWidget {
-  ConversationPage({Key? key}) : super(key: key);
+  ConversationPage({Key? key, required this.chatRoomID, required this.user}) : super(key: key);
   FireStoreMethods fireStoreMethods = FireStoreMethods();
+  final String chatRoomID;
+  final UserCredential user;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ),
-        ),
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFAC83F0), Color(0xFF948CF3)],
-            ),
-          ),
-        ),
-        title: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10000.0),
-              child: CachedNetworkImage(
-                width: 40,
-                height: 40,
-                // imageUrl: chatRoom.chatIcon.toString(),
-                imageUrl:
-                    'https://sun9-47.userapi.com/impf/c852128/v852128674/193b6e/Uy7BDEgRaLE.jpg?size=2048x1999&quality=96&sign=0c1a3a26d3bf367aa97ed347a0b816d6&type=album',
-                placeholder: (context, url) => const CircularProgressIndicator(),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
+    context.read<ConversationBloc>().add(ConversationLoadingEvent(chatRoomID: chatRoomID));
+    AndroidAuthProvider androidAuthProvider = AndroidAuthProvider();
+    FireStoreMethods fireStoreMethods = FireStoreMethods();
+    List<Message> messages = [];
+    TextEditingController messageController = TextEditingController();
+    String displayText = "";
+
+    final itemScrollController = ItemScrollController();
+    void scrollIndex(int index) => itemScrollController.scrollTo(index: index, duration: const Duration(milliseconds: 300));
+
+    return BlocBuilder<ConversationBloc, ConversationState>(
+      builder: (context, state) {
+        if (state is ConversationEmptyState) {
+          Message message = Message(
+            sendBy: 'chatApp',
+            time: DateTime.now().millisecondsSinceEpoch.toString(),
+            email: 'chatApp',
+            message: "You're don't have any messages yet",
+            authorIcon: '',
+          );
+
+          fireStoreMethods.sendMessage(message.toJson(), chatRoomID);
+        }
+        if (state is ConversationLoadingState) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (state is ConversationErrorState) {
+          return Column(
+            children: [
+              const Text('НЕ УДАЛОСЬ ЗАГРУЗИТЬ СООБЩЕНИЯ, ПОФИКСИ ИНЕТ МРАЗЬ'),
+              IconButton(
+                  onPressed: () => context.read<ConversationBloc>().add(ConversationLoadingEvent(chatRoomID: chatRoomID)),
+                  icon: const Icon(
+                    Icons.update,
+                    size: 50,
+                  )),
+            ],
+          );
+        }
+        if (state is ConversationLoadedState) {
+          messages = state.messages;
+
+          final int index = messages.length;
+          // WidgetsBinding.instance!.addPostFrameCallback((_) => scrollIndex(index));
+          // scrollIndex(5);
+
+
+        }
+        return Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
               ),
             ),
-            const SizedBox(
-              width: 20,
+            elevation: 0,
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFAC83F0), Color(0xFF948CF3)],
+                ),
+              ),
             ),
-            const Text(
-              'chat-name',
-              style: TextStyle(fontSize: 24, fontFamily: 'SF', fontWeight: FontWeight.w500),
+            title: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10000.0),
+                  child: CachedNetworkImage(
+                    width: 40,
+                    height: 40,
+                    // imageUrl: chatRoom.chatIcon.toString(),
+                    imageUrl:
+                        'https://sun9-47.userapi.com/impf/c852128/v852128674/193b6e/Uy7BDEgRaLE.jpg?size=2048x1999&quality=96&sign=0c1a3a26d3bf367aa97ed347a0b816d6&type=album',
+                    placeholder: (context, url) => const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => const Icon(Icons.error),
+                  ),
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                const Text(
+                  'chat-name',
+                  style: TextStyle(fontSize: 24, fontFamily: 'SF', fontWeight: FontWeight.w500),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-      body: Container(
-        child: Stack(
-          children: [
-            Container(
-              alignment: Alignment.bottomCenter,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.all(10),
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(width: 2, color: Colors.blueAccent),
-                      ),
-                      padding: const EdgeInsets.all(10),
-                      child: const TextField(
-                        // controller: messageEditingController,
-                        style: TextStyle(color: Colors.grey),
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                        ),
-                      ),
+          ),
+          body: Container(
+            child: Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    child: StreamBuilder<List<Message>>(
+                      stream: context.read<ConversationBloc>().getUpdateMessages(chatRoomID),
+                      builder: (context, snapshot) {
+                        return ScrollablePositionedList.builder(
+                          initialScrollIndex: messages.length,
+                          itemScrollController: itemScrollController,
+                          shrinkWrap: true,
+                          itemCount: messages.length,
+                          itemBuilder: (context, index) => Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              alignment: user.user!.email == messages[index].email ? Alignment.centerRight : Alignment.centerLeft,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: (user.user!.email == messages[index].email)
+                                        ? [const Color(0xFFAC83F0), const Color(0xFF948CF3)]
+                                        : [Colors.white, Colors.white],
+                                  ),
+                                  borderRadius: BorderRadius.circular(5),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 1,
+                                      blurRadius: 2,
+                                      offset: Offset(1, 2), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Text(messages[index].message.toString()),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                  IconButton(onPressed: () async{
-                    print('MESSAGES');
-                    print(await fireStoreMethods.getConversationMessages('OQewp4DKL2q6x9EqJPLV'));
-                  }, icon: const Icon(Icons.send)),
-                ],
-              ),
+                ), /// СООБЩЕНИЯ
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                  child: Container(
+                    alignment: Alignment.bottomCenter,
+                    child: TextField(
+                      controller: messageController,
+                      decoration: const InputDecoration(hintText: 'message'),
+                      maxLines: 1,
+                      onSubmitted: (text) {
+                        Message message = Message(
+                            sendBy: 'Nikita',
+                            time: DateTime.now().millisecondsSinceEpoch.toString(),
+                            email: 'nikitka32171@gmail.com',
+                            message: messageController.text,
+                            authorIcon: '');
+
+                        fireStoreMethods.sendMessage(message.toJson(), chatRoomID);
+
+                        // Future.delayed(const Duration(milliseconds: 2000), () {
+                        //   scrollIndex(messages.length);
+                        // }); HOW TO KEEP POSITION OF MESSAGES?
+                        messageController.clear();
+                      },
+                      // onSubmitted: {},
+                    ),
+                  ),
+                ),  /// TEXTFIELD
+              ],
             ),
-
-
-            Container(
-
-             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

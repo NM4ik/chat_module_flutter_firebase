@@ -1,5 +1,6 @@
 import 'package:chat_flutter/bloc/auth/auth_bloc.dart';
 import 'package:chat_flutter/bloc/chat/chats_cubit.dart';
+import 'package:chat_flutter/bloc/conversation/conversation_bloc.dart';
 import 'package:chat_flutter/data/database/auth/auth_provider.dart';
 import 'package:chat_flutter/data/database/firestore/firestore_methods.dart';
 import 'package:chat_flutter/data/database/local_data/shared_preferences.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => AuthBloc(androidAuthProvider: AndroidAuthProvider())..add(AuthenticatedStarted())),
         BlocProvider(create: (context) => ChatsCubit(fireStoreMethods)),
+        BlocProvider(create: (context) => ConversationBloc()),
       ],
       child: MaterialApp(
           title: 'Flutter Chat Module',

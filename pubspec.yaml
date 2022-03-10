@@ -45,6 +45,8 @@ dependencies:
   cached_network_image: ^3.2.0
 
 
+  scrollable_positioned_list: ^0.2.3
+
   # for state management
   flutter_bloc: ^8.0.1
   equatable:

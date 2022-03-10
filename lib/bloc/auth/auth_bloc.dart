@@ -24,7 +24,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthenticationLoggedOut>(_onAuthLoggedOut);
   }
 
-  void _onAuthStarted(AuthenticatedStarted event, Emitter<AuthState> emit) async {
+  Future<void> _onAuthStarted(AuthenticatedStarted event, Emitter<AuthState> emit) async {
     emit(Uninitialized());
     bool isSignedIn;
     try {

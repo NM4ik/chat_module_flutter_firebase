@@ -28,7 +28,7 @@ class ChatsCubit extends Cubit<ChatsState> {
     return chatsRooms;
   }
 
-  Stream<List<ChatRoom>> getStreamChats(String userID) => Stream.periodic(const Duration(seconds: 3)).asyncMap((_) => updateChats(userID));
+  Stream<List<ChatRoom>> getStreamChats(String userID) => Stream.periodic(const Duration(seconds: 1)).asyncMap((_) => updateChats(userID));
 
   updateChats(String userID) async {
     try {

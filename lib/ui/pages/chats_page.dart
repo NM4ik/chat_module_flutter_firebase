@@ -74,7 +74,7 @@ class ChatsPage extends StatelessWidget {
           ),
           elevation: 0,
         ),
-        body: ChatsBody(userID: user.user!.uid,),
+        body: ChatsBody(user: user,),
       ),
     );
   }
