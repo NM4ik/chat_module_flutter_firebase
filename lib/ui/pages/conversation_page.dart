@@ -9,20 +9,31 @@ import 'package:chat_flutter/ui/pages/chats_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../bloc/conversation/conversation_bloc.dart';
 import '../components/text_field_component.dart';
 
-class ConversationPage extends StatelessWidget {
+class ConversationPage extends StatefulWidget {
   ConversationPage({Key? key, required this.chatRoomID, required this.user}) : super(key: key);
-  FireStoreMethods fireStoreMethods = FireStoreMethods();
   final String chatRoomID;
   final UserCredential user;
 
   @override
+  State<ConversationPage> createState() => _ConversationPageState();
+}
+
+class _ConversationPageState extends State<ConversationPage> {
+  FireStoreMethods fireStoreMethods = FireStoreMethods();
+
+  final DateFormat formatter = DateFormat.yMMMEd();
+  final dateNow = DateFormat.jms('ru');
+
+  @override
   Widget build(BuildContext context) {
-    context.read<ConversationBloc>().add(ConversationLoadingEvent(chatRoomID: chatRoomID));
+    context.read<ConversationBloc>().add(ConversationLoadingEvent(chatRoomID: widget.chatRoomID));
     FireStoreMethods fireStoreMethods = FireStoreMethods();
     List<Message> messages = [];
 
@@ -40,7 +51,7 @@ class ConversationPage extends StatelessWidget {
             authorIcon: '',
           );
 
-          fireStoreMethods.sendMessage(message.toJson(), chatRoomID);
+          fireStoreMethods.sendMessage(message.toJson(), widget.chatRoomID);
         }
         if (state is ConversationLoadingState) {
           return const Center(
@@ -52,7 +63,7 @@ class ConversationPage extends StatelessWidget {
             children: [
               const Text('НЕ УДАЛОСЬ ЗАГРУЗИТЬ СООБЩЕНИЯ, ПОФИКСИ ИНЕТ МРАЗЬ'),
               IconButton(
-                  onPressed: () => context.read<ConversationBloc>().add(ConversationLoadingEvent(chatRoomID: chatRoomID)),
+                  onPressed: () => context.read<ConversationBloc>().add(ConversationLoadingEvent(chatRoomID: widget.chatRoomID)),
                   icon: const Icon(
                     Icons.update,
                     size: 50,
@@ -66,7 +77,6 @@ class ConversationPage extends StatelessWidget {
           final int index = messages.length;
           // WidgetsBinding.instance!.addPostFrameCallback((_) => scrollIndex(index));
           // scrollIndex(5);
-
 
         }
         return Scaffold(
@@ -116,7 +126,7 @@ class ConversationPage extends StatelessWidget {
             children: [
               Expanded(
                 child: StreamBuilder<List<Message>>(
-                  stream: context.read<ConversationBloc>().getUpdateMessages(chatRoomID),
+                  stream: context.read<ConversationBloc>().getUpdateMessages(widget.chatRoomID),
                   builder: (context, snapshot) {
                     return ScrollablePositionedList.builder(
                       initialScrollIndex: messages.length,
@@ -127,13 +137,12 @@ class ConversationPage extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
                           width: MediaQuery.of(context).size.width,
-                          alignment: user.user!.email == messages[index].email ? Alignment.centerRight : Alignment.centerLeft,
+                          alignment: widget.user.user!.email == messages[index].email ? Alignment.centerRight : Alignment.centerLeft,
                           child: Container(
+                            constraints: const BoxConstraints(maxWidth: 250, minWidth: 70),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: (user.user!.email == messages[index].email)
-                                    ? kDefaultGradient
-                                    : [Colors.white, Colors.white],
+                                colors: (widget.user.user!.email == messages[index].email) ? kDefaultGradient : [Colors.white, Colors.white],
                               ),
                               borderRadius: BorderRadius.circular(5),
                               boxShadow: [
@@ -147,7 +156,11 @@ class ConversationPage extends StatelessWidget {
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(10.0),
-                              child: Text(messages[index].message.toString()),
+                              child: Column(
+                                children: [
+                                  Text(messages[index].message.toString()),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -155,20 +168,43 @@ class ConversationPage extends StatelessWidget {
                     );
                   },
                 ),
-              ), /// СООБЩЕНИЯ
+              ),
+
+              /// СООБЩЕНИЯ
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.red),
+                padding: const EdgeInsets.all(10.0),
+                child: Row(children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Color(0xFF948CF3),
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      height: 50,
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(padding: const EdgeInsets.fromLTRB(10, 0, 0, 0), child: TextFieldComponent(chatRoomID: widget.chatRoomID)),
+                    ),
                   ),
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFieldComponent(chatRoomID: chatRoomID),
+                  const SizedBox(
+                    width: 15,
                   ),
-                ),
-              ),  /// TEXTFIELD
+                  Container(
+                    child: IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.arrow_upward_rounded,
+                          color: Colors.white,
+                        )),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      gradient: const LinearGradient(colors: kDefaultGradient),
+                    ),
+                  )
+                ]),
+              ),
             ],
           ),
         );

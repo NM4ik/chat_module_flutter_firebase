@@ -13,6 +13,7 @@ class ChatsPage extends StatelessWidget {
   ChatsPage({Key? key, required this.user}) : super(key: key);
   final UserCredential user;
   FireStoreMethods fireStoreMethods = FireStoreMethods();
+  final chatNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,10 @@ class ChatsPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: const Text("Chats", style: TextStyle(fontFamily: 'SF', fontWeight: FontWeight.w600, fontSize: 24),),
+          title: const Text(
+            "Chats",
+            style: TextStyle(fontFamily: 'SF', fontWeight: FontWeight.w600, fontSize: 24),
+          ),
           actions: [
             BlocConsumer<AuthBloc, AuthState>(
               listener: (context, state) {
@@ -32,29 +36,18 @@ class ChatsPage extends StatelessWidget {
                   // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const AuthenticatedPage()));
                   Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const AuthenticatedPage()), (route) => false);
                 }
-
-                /**
-                 *  fix this.
-                 *  when the state is authenticated this condition isn't triggered
-                 *
-                 *  if (state is Authenticated) {
-                    log('request test');
-                    ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                    backgroundColor: Colors.green,
-                    content: Text('Success'),
-                    ),
-                    );
-                    }
-                 */
               },
               builder: (context, state) {
                 log('${state.runtimeType}', name: 'state type');
                 return Row(
                   children: [
-                    IconButton(onPressed: () async {
-                      // fireStoreMethods.getRoomsByUser();
-                    }, icon: const Icon(Icons.search)),
+                    IconButton(
+                        onPressed: () async {
+                          // var t = await fireStoreMethods.rooms.where('chatRoomId',  isEqualTo: 'new chat57039').get();
+                          // print(t.docs.map((e) => e.data()));
+                          ///поиск чата, сделать вход по id
+                        },
+                        icon: const Icon(Icons.search)),
                     IconButton(
                         onPressed: () {
                           authBloc.add(AuthenticationLoggedOut());
@@ -74,8 +67,61 @@ class ChatsPage extends StatelessWidget {
           ),
           elevation: 0,
         ),
-        body: ChatsBody(user: user,),
+        body: ChatsBody(
+          user: user,
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            openDialog(context);
+          },
+          backgroundColor: const Color(0xFFAC83F0),
+          elevation: 3,
+          child: const Icon(Icons.group_add_sharp),
+        ),
       ),
     );
   }
+
+  void openDialog(BuildContext context) => showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            content: TextField(
+              controller: chatNameController,
+              decoration: const InputDecoration(
+                hintText: 'name',
+                labelText: 'chat-name',
+              ),
+              // onSubmitted: (text) {
+              // },
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    chatNameController.clear();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    'CANCEL',
+                    style: TextStyle(fontFamily: 'SF', fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF948CF3)),
+                  )),
+              TextButton(
+                  onPressed: () {
+                    try {
+                      fireStoreMethods.createChatRoom(chatNameController.text, user.user!.uid);
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text('Room: ${chatNameController.text} was created'), backgroundColor: const Color(0xFFAC83F0)));
+                    } catch (_) {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text("Room: ${chatNameController.text} wasn't created"), backgroundColor: Colors.red));
+                    }
+
+                    chatNameController.clear();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    'CREATE',
+                    style: TextStyle(fontFamily: 'SF', fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF948CF3)),
+                  )),
+            ],
+          ));
 }

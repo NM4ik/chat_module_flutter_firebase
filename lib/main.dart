@@ -13,8 +13,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'bloc/app_bloc_observer.dart';
 import 'data/database/auth/android_auth_provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
+  initializeDateFormatting('ru', null);
   WidgetsFlutterBinding.ensureInitialized();
   await AndroidAuthProvider().initialize();
   runApp(MyApp());

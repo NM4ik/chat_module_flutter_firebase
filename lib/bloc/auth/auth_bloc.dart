@@ -31,6 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       isSignedIn = await androidAuthProvider.isSignedIn();
     } catch (e) {
       isSignedIn = false;
+      log(e.toString(), name: '_onAuthStarted ERROR');
     }
     log('Signed or not:  ${isSignedIn.toString()}');
     if (isSignedIn) {

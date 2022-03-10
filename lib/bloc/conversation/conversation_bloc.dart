@@ -32,7 +32,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     }
   }
 
-  Stream<List<Message>> getUpdateMessages(String chatRoomID) => Stream.periodic(const Duration(seconds: 3)).asyncMap((_) => updateMessages(chatRoomID));
+  Stream<List<Message>> getUpdateMessages(String chatRoomID) => Stream.periodic(const Duration(seconds: 1)).asyncMap((_) => updateMessages(chatRoomID));
 
   updateMessages(String chatRoomID) async {
     try {

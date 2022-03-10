@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:math';
 
 import 'package:chat_flutter/data/entity/chat_room.dart';
 import 'package:chat_flutter/data/entity/message.dart';
@@ -29,11 +30,21 @@ class FireStoreMethods {
   /// CRUD-operation with firestore
 
   sendMessage(Map<String, dynamic> messageMap, String documentId) {
-    rooms.doc(documentId).collection('messages').add(messageMap).catchError((e) => log(e, name: 'sendMessageError'));
+    rooms.doc(documentId).collection('messages').add(messageMap).catchError((e) => print('SEND MESSAGE ERROR:  ${e.toString()}'));
     updateChatRoomLastMessage(messageMap['message'], documentId);
   }
 
   updateChatRoomLastMessage(String lastMessage, String documentId) {
     rooms.doc(documentId).update({'chatLastMessage': lastMessage});
+  }
+
+  createChatRoom(String chatName, String uid) {
+    int random = Random().nextInt(100000);
+    List<dynamic> ids = [uid];
+
+    ChatRoom chatRoom =
+        ChatRoom(name: chatName, chatRoomId: chatName + random.toString(), lastMessageTime: '', chatLastMessage: '', chatIcon: '', usersId: ids);
+
+    rooms.add(chatRoom.toJson());
   }
 }

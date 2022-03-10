@@ -44,8 +44,11 @@ dependencies:
   # for network images
   cached_network_image: ^3.2.0
 
-
+  # for listview.builder
   scrollable_positioned_list: ^0.2.3
+
+  # date-formatter
+  intl: ^0.17.0
 
   # for state management
   flutter_bloc: ^8.0.1
