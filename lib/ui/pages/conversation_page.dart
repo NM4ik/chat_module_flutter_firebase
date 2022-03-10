@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_flutter/bloc/auth/auth_bloc.dart';
 import 'package:chat_flutter/bloc/chat/chats_cubit.dart';
+import 'package:chat_flutter/constants.dart';
 import 'package:chat_flutter/data/database/auth/android_auth_provider.dart';
 import 'package:chat_flutter/data/database/firestore/firestore_methods.dart';
 import 'package:chat_flutter/data/entity/message.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../bloc/conversation/conversation_bloc.dart';
+import '../components/text_field_component.dart';
 
 class ConversationPage extends StatelessWidget {
   ConversationPage({Key? key, required this.chatRoomID, required this.user}) : super(key: key);
@@ -21,14 +23,11 @@ class ConversationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     context.read<ConversationBloc>().add(ConversationLoadingEvent(chatRoomID: chatRoomID));
-    AndroidAuthProvider androidAuthProvider = AndroidAuthProvider();
     FireStoreMethods fireStoreMethods = FireStoreMethods();
     List<Message> messages = [];
-    TextEditingController messageController = TextEditingController();
-    String displayText = "";
 
     final itemScrollController = ItemScrollController();
-    void scrollIndex(int index) => itemScrollController.scrollTo(index: index, duration: const Duration(milliseconds: 300));
+    // void scrollIndex(int index) => itemScrollController.scrollTo(index: index, duration: const Duration(milliseconds: 300));
 
     return BlocBuilder<ConversationBloc, ConversationState>(
       builder: (context, state) {
@@ -113,82 +112,64 @@ class ConversationPage extends StatelessWidget {
               ],
             ),
           ),
-          body: Container(
-            child: Column(
-              children: [
-                Expanded(
-                  child: Container(
-                    child: StreamBuilder<List<Message>>(
-                      stream: context.read<ConversationBloc>().getUpdateMessages(chatRoomID),
-                      builder: (context, snapshot) {
-                        return ScrollablePositionedList.builder(
-                          initialScrollIndex: messages.length,
-                          itemScrollController: itemScrollController,
-                          shrinkWrap: true,
-                          itemCount: messages.length,
-                          itemBuilder: (context, index) => Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              alignment: user.user!.email == messages[index].email ? Alignment.centerRight : Alignment.centerLeft,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: (user.user!.email == messages[index].email)
-                                        ? [const Color(0xFFAC83F0), const Color(0xFF948CF3)]
-                                        : [Colors.white, Colors.white],
-                                  ),
-                                  borderRadius: BorderRadius.circular(5),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 1,
-                                      blurRadius: 2,
-                                      offset: Offset(1, 2), // changes position of shadow
-                                    ),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Text(messages[index].message.toString()),
-                                ),
+          body: Column(
+            children: [
+              Expanded(
+                child: StreamBuilder<List<Message>>(
+                  stream: context.read<ConversationBloc>().getUpdateMessages(chatRoomID),
+                  builder: (context, snapshot) {
+                    return ScrollablePositionedList.builder(
+                      initialScrollIndex: messages.length,
+                      itemScrollController: itemScrollController,
+                      shrinkWrap: true,
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          alignment: user.user!.email == messages[index].email ? Alignment.centerRight : Alignment.centerLeft,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: (user.user!.email == messages[index].email)
+                                    ? kDefaultGradient
+                                    : [Colors.white, Colors.white],
                               ),
+                              borderRadius: BorderRadius.circular(5),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 1,
+                                  blurRadius: 2,
+                                  offset: Offset(1, 2), // changes position of shadow
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text(messages[index].message.toString()),
                             ),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ), /// СООБЩЕНИЯ
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.red),
                   ),
-                ), /// СООБЩЕНИЯ
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                  child: Container(
-                    alignment: Alignment.bottomCenter,
-                    child: TextField(
-                      controller: messageController,
-                      decoration: const InputDecoration(hintText: 'message'),
-                      maxLines: 1,
-                      onSubmitted: (text) {
-                        Message message = Message(
-                            sendBy: 'Nikita',
-                            time: DateTime.now().millisecondsSinceEpoch.toString(),
-                            email: 'nikitka32171@gmail.com',
-                            message: messageController.text,
-                            authorIcon: '');
-
-                        fireStoreMethods.sendMessage(message.toJson(), chatRoomID);
-
-                        // Future.delayed(const Duration(milliseconds: 2000), () {
-                        //   scrollIndex(messages.length);
-                        // }); HOW TO KEEP POSITION OF MESSAGES?
-                        messageController.clear();
-                      },
-                      // onSubmitted: {},
-                    ),
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFieldComponent(chatRoomID: chatRoomID),
                   ),
-                ),  /// TEXTFIELD
-              ],
-            ),
+                ),
+              ),  /// TEXTFIELD
+            ],
           ),
         );
       },
