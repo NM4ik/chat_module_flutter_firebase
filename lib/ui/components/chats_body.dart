@@ -45,12 +45,12 @@ class _ChatsBodyState extends State<ChatsBody> {
           );
         } else if (state is ChatsEmptyState) {
           log('empty', name: 'state');
-          return const ChatsBodyHeaderWidget(
-            text: "You don't have active chats",
-          );
+          // const ChatsBodyHeaderWidget(text: 'empty',);
+          // return const ChatsBodyHeaderWidget(
+          //   text: "You don't have active chats",
+          // );
         }
 
-        /// need implement streamBuilder.
 
         return Column(
           children: [

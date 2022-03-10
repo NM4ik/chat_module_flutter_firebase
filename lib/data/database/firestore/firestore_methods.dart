@@ -25,8 +25,6 @@ class FireStoreMethods {
     return t.docs.map((e) => Message.fromJson(e.data())).toList();
   }
 
-  // Stream<List<Message>> getStreamMessages(String chatRoomId) => Stream.periodic(const Duration(seconds: 1)).asyncMap((_) => getConversationMessages(chatRoomId));
-
   /// CRUD-operation with firestore
 
   sendMessage(Map<String, dynamic> messageMap, String documentId) {
@@ -45,6 +43,6 @@ class FireStoreMethods {
     ChatRoom chatRoom =
         ChatRoom(name: chatName, chatRoomId: chatName + random.toString(), lastMessageTime: '', chatLastMessage: '', chatIcon: '', usersId: ids);
 
-    rooms.add(chatRoom.toJson());
+    rooms.doc(chatRoom.chatRoomId).set(chatRoom.toJson());
   }
 }

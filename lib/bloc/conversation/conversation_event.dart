@@ -12,3 +12,9 @@ class ConversationLoadingEvent extends ConversationEvent {
   @override
   List<Object> get props => [chatRoomID];
 }
+
+class ConversationCloseEvent extends ConversationEvent {
+
+  @override
+  List<Object> get props => [];
+}

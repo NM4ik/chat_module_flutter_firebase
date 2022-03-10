@@ -38,16 +38,9 @@ class ChatsBodyHeaderWidget extends StatelessWidget {
   }
 
   Widget getTextIfEmpty() {
-    return Column(
-      children: [
-        const SizedBox(
-          height: 30,
-        ),
-        Text(
-          text.toString(),
-          style: const TextStyle(fontSize: 24, color: Colors.white),
-        )
-      ],
+    return Text(
+      text.toString(),
+      style: const TextStyle(fontSize: 24, color: Colors.white),
     );
   }
 }

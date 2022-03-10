@@ -19,9 +19,10 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
   Future<void> _onEventStarted(ConversationLoadingEvent event, Emitter<ConversationState> emit) async {
     // emit(ConversationLoadingState());
+    List<Message> messages = [];
 
     try {
-      final List<Message> messages = await fireStoreMethods.getConversationMessages(event.chatRoomID);
+      messages = await fireStoreMethods.getConversationMessages(event.chatRoomID);
       if (messages.isEmpty) {
         emit(ConversationEmptyState());
       } else if (messages.isNotEmpty) {

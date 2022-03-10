@@ -48,7 +48,7 @@ class ChatCard extends StatelessWidget {
                       imageUrl: chatRoom.chatIcon.toString(),
                       // 'https://sun9-47.userapi.com/impf/c852128/v852128674/193b6e/Uy7BDEgRaLE.jpg?size=2048x1999&quality=96&sign=0c1a3a26d3bf367aa97ed347a0b816d6&type=album',
                       placeholder: (context, url) => const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                      errorWidget: (context, url, error) => Image.network('https://firebasestorage.googleapis.com/v0/b/the-chat-module.appspot.com/o/Rectangle%2014.jpg?alt=media&token=5508d866-c3c9-4b6c-9da5-73bdfcf6c06f'),
                     ),
                   ),
                 ),

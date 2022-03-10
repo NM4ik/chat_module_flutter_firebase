@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_flutter/bloc/auth/auth_bloc.dart';
 import 'package:chat_flutter/bloc/chat/chats_cubit.dart';
@@ -107,7 +109,7 @@ class _ConversationPageState extends State<ConversationPage> {
                     height: 40,
                     // imageUrl: chatRoom.chatIcon.toString(),
                     imageUrl:
-                        'https://sun9-47.userapi.com/impf/c852128/v852128674/193b6e/Uy7BDEgRaLE.jpg?size=2048x1999&quality=96&sign=0c1a3a26d3bf367aa97ed347a0b816d6&type=album',
+                    'https://firebasestorage.googleapis.com/v0/b/the-chat-module.appspot.com/o/Rectangle%2014.jpg?alt=media&token=5508d866-c3c9-4b6c-9da5-73bdfcf6c06f',
                     placeholder: (context, url) => const CircularProgressIndicator(),
                     errorWidget: (context, url, error) => const Icon(Icons.error),
                   ),
@@ -128,10 +130,10 @@ class _ConversationPageState extends State<ConversationPage> {
                 child: StreamBuilder<List<Message>>(
                   stream: context.read<ConversationBloc>().getUpdateMessages(widget.chatRoomID),
                   builder: (context, snapshot) {
-                    return ScrollablePositionedList.builder(
-                      initialScrollIndex: messages.length,
-                      itemScrollController: itemScrollController,
-                      shrinkWrap: true,
+                    // return ScrollablePositionedList.builder(
+                    // initialScrollIndex: messages.length,
+                    // itemScrollController: itemScrollController,
+                    return ListView.builder(
                       itemCount: messages.length,
                       itemBuilder: (context, index) => Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -193,7 +195,9 @@ class _ConversationPageState extends State<ConversationPage> {
                   ),
                   Container(
                     child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // log(widget.chatRoomID, name: "CHATROOMID: ");
+                        },
                         icon: const Icon(
                           Icons.arrow_upward_rounded,
                           color: Colors.white,

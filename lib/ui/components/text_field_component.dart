@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chat_flutter/data/database/firestore/firestore_methods.dart';
 import 'package:flutter/material.dart';
 
@@ -24,6 +26,7 @@ class TextFieldComponent extends StatelessWidget {
             authorIcon: '');
 
         fireStoreMethods.sendMessage(message.toJson(), chatRoomID);
+        // log(chatRoomID, name: "CHATROOMID: ");
 
         // Future.delayed(const Duration(milliseconds: 2000), () {
         //   scrollIndex(messages.length);
