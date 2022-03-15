@@ -23,7 +23,7 @@ class ChatRoom extends Equatable {
         usersId: json['users'],
         chatIcon: json['chatIcon'],
         chatLastMessage: json['chatLastMessage'],
-        lastMessageTime: json['lastMessageTime']);
+        lastMessageTime: json['lastMessageTime'].toString());
   }
 
 

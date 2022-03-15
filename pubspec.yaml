@@ -40,6 +40,11 @@ dependencies:
   firebase_core: ^1.13.1
   firebase_auth: ^3.3.9
   google_sign_in: ^5.2.4
+  firebase_storage: ^10.2.9
+
+  # files picker from device
+  file_picker: ^4.5.1
+
 
   # for network images
   cached_network_image: ^3.2.0

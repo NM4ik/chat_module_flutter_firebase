@@ -1,15 +1,17 @@
 import 'dart:developer';
 
 import 'package:chat_flutter/data/database/firestore/firestore_methods.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/entity/message.dart';
 
 class TextFieldComponent extends StatelessWidget {
-  TextFieldComponent({Key? key, required this.chatRoomID}) : super(key: key);
+  TextFieldComponent({Key? key, required this.chatRoomID, required this.userCredential}) : super(key: key);
   TextEditingController messageController = TextEditingController();
   FireStoreMethods fireStoreMethods = FireStoreMethods();
   final String chatRoomID;
+  final UserCredential userCredential;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,7 @@ class TextFieldComponent extends StatelessWidget {
         Message message = Message(
             sendBy: 'Nikita',
             time: DateTime.now().millisecondsSinceEpoch.toString(),
-            email: 'nikitka32171@gmail.com',
+            email: '${userCredential.user!.email}',
             message: messageController.text,
             authorIcon: '');
 

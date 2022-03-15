@@ -1,18 +1,13 @@
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chat_flutter/bloc/auth/auth_bloc.dart';
-import 'package:chat_flutter/bloc/chat/chats_cubit.dart';
 import 'package:chat_flutter/constants.dart';
-import 'package:chat_flutter/data/database/auth/android_auth_provider.dart';
 import 'package:chat_flutter/data/database/firestore/firestore_methods.dart';
 import 'package:chat_flutter/data/entity/message.dart';
-import 'package:chat_flutter/ui/pages/chats_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../bloc/conversation/conversation_bloc.dart';
@@ -85,8 +80,9 @@ class _ConversationPageState extends State<ConversationPage> {
           appBar: AppBar(
             leading: IconButton(
               onPressed: () {
+                context.read<ConversationBloc>().add(ConversationCloseEvent());
                 Navigator.pop(context);
-              },
+              }, // emit(ConversationLoadingState());
               icon: const Icon(
                 Icons.arrow_back_ios,
                 color: Colors.white,
@@ -109,7 +105,7 @@ class _ConversationPageState extends State<ConversationPage> {
                     height: 40,
                     // imageUrl: chatRoom.chatIcon.toString(),
                     imageUrl:
-                    'https://firebasestorage.googleapis.com/v0/b/the-chat-module.appspot.com/o/Rectangle%2014.jpg?alt=media&token=5508d866-c3c9-4b6c-9da5-73bdfcf6c06f',
+                        'https://firebasestorage.googleapis.com/v0/b/the-chat-module.appspot.com/o/Rectangle%2014.jpg?alt=media&token=5508d866-c3c9-4b6c-9da5-73bdfcf6c06f',
                     placeholder: (context, url) => const CircularProgressIndicator(),
                     errorWidget: (context, url, error) => const Icon(Icons.error),
                   ),
@@ -131,9 +127,10 @@ class _ConversationPageState extends State<ConversationPage> {
                   stream: context.read<ConversationBloc>().getUpdateMessages(widget.chatRoomID),
                   builder: (context, snapshot) {
                     // return ScrollablePositionedList.builder(
-                    // initialScrollIndex: messages.length,
+                    // initialScrollIndex: messages.length - 1,
                     // itemScrollController: itemScrollController,
                     return ListView.builder(
+                      physics: const BouncingScrollPhysics(),
                       itemCount: messages.length,
                       itemBuilder: (context, index) => Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -187,7 +184,12 @@ class _ConversationPageState extends State<ConversationPage> {
                       ),
                       height: 50,
                       alignment: Alignment.bottomCenter,
-                      child: Padding(padding: const EdgeInsets.fromLTRB(10, 0, 0, 0), child: TextFieldComponent(chatRoomID: widget.chatRoomID)),
+                      child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                          child: TextFieldComponent(
+                            chatRoomID: widget.chatRoomID,
+                            userCredential: widget.user,
+                          )),
                     ),
                   ),
                   const SizedBox(

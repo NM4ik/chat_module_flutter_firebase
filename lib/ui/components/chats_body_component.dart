@@ -9,17 +9,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'chat_card.dart';
+import 'chat_card_component.dart';
 
-class ChatsBody extends StatefulWidget {
-  const ChatsBody({Key? key, required this.user}) : super(key: key);
+class ChatsBodyComponent extends StatefulWidget {
+  const ChatsBodyComponent({Key? key, required this.user}) : super(key: key);
   final UserCredential user;
 
   @override
-  State<ChatsBody> createState() => _ChatsBodyState();
+  State<ChatsBodyComponent> createState() => _ChatsBodyComponentState();
 }
 
-class _ChatsBodyState extends State<ChatsBody> {
+class _ChatsBodyComponentState extends State<ChatsBodyComponent> {
   @override
   Widget build(BuildContext context) {
     bool isFirstButton = true;
@@ -28,7 +28,6 @@ class _ChatsBodyState extends State<ChatsBody> {
 
     return BlocBuilder<ChatsCubit, ChatsState>(
       builder: (context, state) {
-
         List<ChatRoom> chats = [];
 
         if (state is ChatsLoadingState) {
@@ -51,7 +50,6 @@ class _ChatsBodyState extends State<ChatsBody> {
           // );
         }
 
-
         return Column(
           children: [
             const ChatsBodyHeaderWidget(),
@@ -61,7 +59,8 @@ class _ChatsBodyState extends State<ChatsBody> {
                   return Expanded(
                       child: ListView.builder(
                     itemCount: chats.length,
-                    itemBuilder: (context, index) => ChatCard(
+                    itemBuilder: (context, index) => ChatCardComponent(
+                      // key: Uniq,
                       chatRoom: chats[index],
                       user: widget.user,
                     ),

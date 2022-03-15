@@ -15,6 +15,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
   ConversationBloc() : super(ConversationLoadingState()) {
     on<ConversationLoadingEvent>(_onEventStarted);
+    on<ConversationCloseEvent>(_onEventClosed);
   }
 
   Future<void> _onEventStarted(ConversationLoadingEvent event, Emitter<ConversationState> emit) async {
@@ -47,5 +48,9 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     } catch (e) {
       emit(ConversationErrorState(message: e.toString()));
     }
+  }
+
+  FutureOr<void> _onEventClosed(ConversationCloseEvent event, Emitter<ConversationState> emit) {
+    emit(ConversationLoadingState());
   }
 }

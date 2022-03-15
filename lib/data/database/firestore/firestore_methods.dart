@@ -13,7 +13,7 @@ class FireStoreMethods {
   /// GET-methods from firestore
   Future<List<ChatRoom>> getRoomsByUser(String userID) async {
     List<ChatRoom> chatRooms = [];
-    var t = await rooms.where("users", arrayContains: userID).get();
+    var t = await rooms.orderBy("lastMessageTime", descending: true).where("users", arrayContains: userID).get();
     t.docs.map((e) {
       chatRooms.add(ChatRoom.fromJson(e.data() as Map<String, dynamic>));
     }).toList();
@@ -29,20 +29,31 @@ class FireStoreMethods {
 
   sendMessage(Map<String, dynamic> messageMap, String documentId) {
     rooms.doc(documentId).collection('messages').add(messageMap).catchError((e) => print('SEND MESSAGE ERROR:  ${e.toString()}'));
-    updateChatRoomLastMessage(messageMap['message'], documentId);
+    updateChatRoomLastMessageAndTime(messageMap['message'], documentId);
   }
 
-  updateChatRoomLastMessage(String lastMessage, String documentId) {
+  updateChatRoomLastMessageAndTime(String lastMessage, String documentId) {
     rooms.doc(documentId).update({'chatLastMessage': lastMessage});
+    rooms.doc(documentId).update({'lastMessageTime': DateTime.now().millisecondsSinceEpoch});
   }
 
-  createChatRoom(String chatName, String uid) {
+  String createChatRoom(String chatName, String uid, String chatIcon) {
     int random = Random().nextInt(100000);
     List<dynamic> ids = [uid];
 
+    String id = chatName + random.toString();
+
     ChatRoom chatRoom =
-        ChatRoom(name: chatName, chatRoomId: chatName + random.toString(), lastMessageTime: '', chatLastMessage: '', chatIcon: '', usersId: ids);
+        ChatRoom(name: chatName, chatRoomId: id, lastMessageTime: '', chatLastMessage: '', chatIcon: chatIcon.isEmpty ? '' : chatIcon, usersId: ids);
 
     rooms.doc(chatRoom.chatRoomId).set(chatRoom.toJson());
+
+    return id;
+  }
+
+  joinChatRoom(String chatRoomId, String uid) {
+    rooms.doc('qwe21658').update({
+      'users': FieldValue.arrayUnion([uid])
+    });
   }
 }
