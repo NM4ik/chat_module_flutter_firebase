@@ -44,15 +44,10 @@ class _ChatsBodyComponentState extends State<ChatsBodyComponent> {
           );
         } else if (state is ChatsEmptyState) {
           log('empty', name: 'state');
-          // const ChatsBodyHeaderWidget(text: 'empty',);
-          // return const ChatsBodyHeaderWidget(
-          //   text: "You don't have active chats",
-          // );
         }
 
         return Column(
           children: [
-            const ChatsBodyHeaderWidget(),
             StreamBuilder<List<ChatRoom>>(
                 stream: context.read<ChatsCubit>().getStreamChats(widget.user.user!.uid),
                 builder: (context, snapshot) {

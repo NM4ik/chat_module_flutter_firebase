@@ -139,6 +139,9 @@ class _ChatsPageState extends State<ChatsPage> {
                     height: kDefaultPadding,
                   ),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Color(0xFFAC83F0),
+                    ),
                       onPressed: () async {
                         newImage = await uploadImage.selectFile();
 
@@ -146,7 +149,7 @@ class _ChatsPageState extends State<ChatsPage> {
                           const SnackBar(content: Text('Image Added')),
                         );
                       },
-                      child: const Text('upload image for chat')),
+                      child: const Text('upload image for chat', style: TextStyle(color: Colors.white),)),
                 ],
               ),
               actions: [
@@ -174,9 +177,6 @@ class _ChatsPageState extends State<ChatsPage> {
                         fireStoreMethods.createChatRoom(chatNameController.text, widget.user.user!.uid, destination);
                         ScaffoldMessenger.of(context)
                             .showSnackBar(SnackBar(content: Text('Room: ${chatNameController.text} was created'), backgroundColor: const Color(0xFFAC83F0)));
-                        //
-                        // chatNameController.clear();
-                        // Navigator.of(context).pop();
                       } catch (_) {
                         ScaffoldMessenger.of(context)
                             .showSnackBar(SnackBar(content: Text("Room: ${chatNameController.text} wasn't created"), backgroundColor: Colors.red));
@@ -220,10 +220,10 @@ class _ChatsPageState extends State<ChatsPage> {
                     try {
                       fireStoreMethods.joinChatRoom(chatNameController.text, widget.user.user!.uid);
                       ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text('Room: ${chatNameController.text} was created'), backgroundColor: const Color(0xFFAC83F0)));
+                          .showSnackBar(SnackBar(content: Text('Room: ${chatNameController.text} was added'), backgroundColor: const Color(0xFFAC83F0)));
                     } catch (_) {
                       ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text("Room: ${chatNameController.text} wasn't created"), backgroundColor: Colors.red));
+                          .showSnackBar(SnackBar(content: Text("Room: ${chatNameController.text} wasn't added"), backgroundColor: Colors.red));
                     }
 
                     chatNameController.clear();

@@ -52,7 +52,7 @@ class FireStoreMethods {
   }
 
   joinChatRoom(String chatRoomId, String uid) {
-    rooms.doc('qwe21658').update({
+    rooms.doc(chatRoomId).update({
       'users': FieldValue.arrayUnion([uid])
     });
   }

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_flutter/constants.dart';
 import 'package:chat_flutter/data/database/firestore/firestore_methods.dart';
@@ -7,15 +5,15 @@ import 'package:chat_flutter/data/entity/message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../bloc/conversation/conversation_bloc.dart';
+import '../../data/entity/chat_room.dart';
 import '../components/text_field_component.dart';
 
 class ConversationPage extends StatefulWidget {
-  ConversationPage({Key? key, required this.chatRoomID, required this.user}) : super(key: key);
-  final String chatRoomID;
+  const ConversationPage({Key? key, required this.chatRoom, required this.user}) : super(key: key);
+  final ChatRoom chatRoom;
   final UserCredential user;
 
   @override
@@ -25,12 +23,9 @@ class ConversationPage extends StatefulWidget {
 class _ConversationPageState extends State<ConversationPage> {
   FireStoreMethods fireStoreMethods = FireStoreMethods();
 
-  final DateFormat formatter = DateFormat.yMMMEd();
-  final dateNow = DateFormat.jms('ru');
-
   @override
   Widget build(BuildContext context) {
-    context.read<ConversationBloc>().add(ConversationLoadingEvent(chatRoomID: widget.chatRoomID));
+    context.read<ConversationBloc>().add(ConversationLoadingEvent(chatRoomID: widget.chatRoom.chatRoomId.toString()));
     FireStoreMethods fireStoreMethods = FireStoreMethods();
     List<Message> messages = [];
 
@@ -48,7 +43,7 @@ class _ConversationPageState extends State<ConversationPage> {
             authorIcon: '',
           );
 
-          fireStoreMethods.sendMessage(message.toJson(), widget.chatRoomID);
+          fireStoreMethods.sendMessage(message.toJson(), widget.chatRoom.chatRoomId.toString());
         }
         if (state is ConversationLoadingState) {
           return const Center(
@@ -60,7 +55,7 @@ class _ConversationPageState extends State<ConversationPage> {
             children: [
               const Text('НЕ УДАЛОСЬ ЗАГРУЗИТЬ СООБЩЕНИЯ, ПОФИКСИ ИНЕТ МРАЗЬ'),
               IconButton(
-                  onPressed: () => context.read<ConversationBloc>().add(ConversationLoadingEvent(chatRoomID: widget.chatRoomID)),
+                  onPressed: () => context.read<ConversationBloc>().add(ConversationLoadingEvent(chatRoomID: widget.chatRoom.chatRoomId.toString())),
                   icon: const Icon(
                     Icons.update,
                     size: 50,
@@ -103,9 +98,9 @@ class _ConversationPageState extends State<ConversationPage> {
                   child: CachedNetworkImage(
                     width: 40,
                     height: 40,
-                    // imageUrl: chatRoom.chatIcon.toString(),
-                    imageUrl:
-                        'https://firebasestorage.googleapis.com/v0/b/the-chat-module.appspot.com/o/Rectangle%2014.jpg?alt=media&token=5508d866-c3c9-4b6c-9da5-73bdfcf6c06f',
+                    imageUrl: widget.chatRoom.chatIcon.toString(),
+                    // imageUrl:
+                    //     'https://firebasestorage.googleapis.com/v0/b/the-chat-module.appspot.com/o/Rectangle%2014.jpg?alt=media&token=5508d866-c3c9-4b6c-9da5-73bdfcf6c06f',
                     placeholder: (context, url) => const CircularProgressIndicator(),
                     errorWidget: (context, url, error) => const Icon(Icons.error),
                   ),
@@ -113,8 +108,8 @@ class _ConversationPageState extends State<ConversationPage> {
                 const SizedBox(
                   width: 20,
                 ),
-                const Text(
-                  'chat-name',
+                Text(
+                  widget.chatRoom.name,
                   style: TextStyle(fontSize: 24, fontFamily: 'SF', fontWeight: FontWeight.w500),
                 ),
               ],
@@ -124,7 +119,7 @@ class _ConversationPageState extends State<ConversationPage> {
             children: [
               Expanded(
                 child: StreamBuilder<List<Message>>(
-                  stream: context.read<ConversationBloc>().getUpdateMessages(widget.chatRoomID),
+                  stream: context.read<ConversationBloc>().getUpdateMessages(widget.chatRoom.chatRoomId.toString()),
                   builder: (context, snapshot) {
                     // return ScrollablePositionedList.builder(
                     // initialScrollIndex: messages.length - 1,
@@ -156,7 +151,9 @@ class _ConversationPageState extends State<ConversationPage> {
                             child: Padding(
                               padding: const EdgeInsets.all(10.0),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Text(messages[index].email, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, fontFamily: 'SF'),),
                                   Text(messages[index].message.toString()),
                                 ],
                               ),
@@ -187,7 +184,7 @@ class _ConversationPageState extends State<ConversationPage> {
                       child: Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                           child: TextFieldComponent(
-                            chatRoomID: widget.chatRoomID,
+                            chatRoomID: widget.chatRoom.chatRoomId.toString(),
                             userCredential: widget.user,
                           )),
                     ),

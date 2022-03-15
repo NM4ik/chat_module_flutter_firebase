@@ -32,7 +32,7 @@ class _ChatCardComponentState extends State<ChatCardComponent> {
             context,
             MaterialPageRoute(
                 builder: (context) => ConversationPage(
-                      chatRoomID: widget.chatRoom.chatRoomId.toString(),
+                      chatRoom: widget.chatRoom,
                       user: widget.user,
                     )));
       },
