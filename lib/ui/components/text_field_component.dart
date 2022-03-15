@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import '../../data/entity/message.dart';
 
 class TextFieldComponent extends StatelessWidget {
-  TextFieldComponent({Key? key, required this.chatRoomID, required this.userCredential}) : super(key: key);
-  TextEditingController messageController = TextEditingController();
+  TextFieldComponent({Key? key, required this.chatRoomID, required this.userCredential,required this.messageController}) : super(key: key);
+  var messageController;
   FireStoreMethods fireStoreMethods = FireStoreMethods();
   final String chatRoomID;
   final UserCredential userCredential;
@@ -21,7 +21,7 @@ class TextFieldComponent extends StatelessWidget {
       maxLines: 1,
       onSubmitted: (text) {
         Message message = Message(
-            sendBy: 'Nikita',
+            sendBy: userCredential.user!.displayName.toString(),
             time: DateTime.now().millisecondsSinceEpoch.toString(),
             email: '${userCredential.user!.email}',
             message: messageController.text,

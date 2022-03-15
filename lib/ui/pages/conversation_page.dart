@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_flutter/constants.dart';
 import 'package:chat_flutter/data/database/firestore/firestore_methods.dart';
@@ -8,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../bloc/conversation/conversation_bloc.dart';
+import '../../data/database/firestore/firestore_storage_image_download.dart';
 import '../../data/entity/chat_room.dart';
 import '../components/text_field_component.dart';
 
@@ -22,6 +25,9 @@ class ConversationPage extends StatefulWidget {
 
 class _ConversationPageState extends State<ConversationPage> {
   FireStoreMethods fireStoreMethods = FireStoreMethods();
+  FireStorageDownloadImage uploadImage = FireStorageDownloadImage();
+  TextEditingController messageController = TextEditingController();
+  late File? newImage;
 
   @override
   Widget build(BuildContext context) {
@@ -92,10 +98,12 @@ class _ConversationPageState extends State<ConversationPage> {
               ),
             ),
             title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10000.0),
                   child: CachedNetworkImage(
+                    fit: BoxFit.cover,
                     width: 40,
                     height: 40,
                     imageUrl: widget.chatRoom.chatIcon.toString(),
@@ -108,10 +116,61 @@ class _ConversationPageState extends State<ConversationPage> {
                 const SizedBox(
                   width: 20,
                 ),
-                Text(
-                  widget.chatRoom.name,
-                  style: TextStyle(fontSize: 24, fontFamily: 'SF', fontWeight: FontWeight.w500),
+                Expanded(
+                  flex: 3,
+                  child: Text(
+                    widget.chatRoom.name,
+                    style: TextStyle(fontSize: 24, fontFamily: 'SF', fontWeight: FontWeight.w500),
+                  ),
                 ),
+                PopupMenuButton(
+                    itemBuilder: (context) => [
+                          PopupMenuItem(child: Text('id for join: ${widget.chatRoom.chatRoomId}')),
+                          PopupMenuItem(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.update,
+                                    color: Colors.black,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text('change icon'),
+                                ],
+                              ),
+                              onTap: () async {
+                                newImage = await uploadImage.selectFile();
+
+                                var destination = '';
+                                try {
+                                  destination = await uploadImage.uploadFile(newImage!);
+                                } catch (_) {
+                                  destination = 'https://siamturakij.com/assets/uploads/img_news/no-images.jpg';
+                                }
+
+                                fireStoreMethods.rooms.doc(widget.chatRoom.chatRoomId).update({'chatIcon': destination});
+
+                                Navigator.of(context).pop();
+                              }),
+                          PopupMenuItem(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.delete,
+                                    color: Colors.black,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text('delete chat'),
+                                ],
+                              ),
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                fireStoreMethods.rooms.doc(widget.chatRoom.chatRoomId).delete();
+                              }),
+                        ]),
               ],
             ),
           ),
@@ -153,7 +212,10 @@ class _ConversationPageState extends State<ConversationPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(messages[index].email, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, fontFamily: 'SF'),),
+                                  Text(
+                                    messages[index].email,
+                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, fontFamily: 'SF'),
+                                  ),
                                   Text(messages[index].message.toString()),
                                 ],
                               ),
@@ -184,6 +246,7 @@ class _ConversationPageState extends State<ConversationPage> {
                       child: Padding(
                           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                           child: TextFieldComponent(
+                            messageController: messageController,
                             chatRoomID: widget.chatRoom.chatRoomId.toString(),
                             userCredential: widget.user,
                           )),
@@ -195,7 +258,15 @@ class _ConversationPageState extends State<ConversationPage> {
                   Container(
                     child: IconButton(
                         onPressed: () {
-                          // log(widget.chatRoomID, name: "CHATROOMID: ");
+                          Message message = Message(
+                              sendBy: widget.user.user!.displayName.toString(),
+                              time: DateTime.now().millisecondsSinceEpoch.toString(),
+                              email: widget.user.user!.email.toString(),
+                              message: messageController.text,
+                              authorIcon: '');
+
+                          fireStoreMethods.sendMessage(message.toJson(), widget.chatRoom.chatRoomId.toString());
+                          messageController.clear();
                         },
                         icon: const Icon(
                           Icons.arrow_upward_rounded,

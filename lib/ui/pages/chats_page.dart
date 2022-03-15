@@ -57,13 +57,7 @@ class _ChatsPageState extends State<ChatsPage> {
                 log('${state.runtimeType}', name: 'state type');
                 return Row(
                   children: [
-                    IconButton(
-                        onPressed: () async {
-                          // var t = await fireStoreMethods.rooms.where('chatRoomId',  isEqualTo: 'new chat57039').get();
-                          // print(t.docs.map((e) => e.data()));
-                          ///поиск чата, сделать вход по id
-                        },
-                        icon: const Icon(Icons.search)),
+                    IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
                     IconButton(
                         onPressed: () {
                           authBloc.add(AuthenticationLoggedOut());
@@ -139,9 +133,9 @@ class _ChatsPageState extends State<ChatsPage> {
                     height: kDefaultPadding,
                   ),
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Color(0xFFAC83F0),
-                    ),
+                      style: ElevatedButton.styleFrom(
+                        primary: Color(0xFFAC83F0),
+                      ),
                       onPressed: () async {
                         newImage = await uploadImage.selectFile();
 
@@ -149,7 +143,10 @@ class _ChatsPageState extends State<ChatsPage> {
                           const SnackBar(content: Text('Image Added')),
                         );
                       },
-                      child: const Text('upload image for chat', style: TextStyle(color: Colors.white),)),
+                      child: const Text(
+                        'upload image for chat',
+                        style: TextStyle(color: Colors.white),
+                      )),
                 ],
               ),
               actions: [
