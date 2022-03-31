@@ -62,6 +62,9 @@ dependencies:
   # for local data
   shared_preferences: ^2.0.13
 
+  # message styles
+  bubble: ^1.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

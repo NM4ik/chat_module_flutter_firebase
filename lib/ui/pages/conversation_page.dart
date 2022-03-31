@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bubble/bubble.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_flutter/constants.dart';
 import 'package:chat_flutter/data/database/firestore/firestore_methods.dart';
@@ -28,6 +29,7 @@ class _ConversationPageState extends State<ConversationPage> {
   FireStorageDownloadImage uploadImage = FireStorageDownloadImage();
   TextEditingController messageController = TextEditingController();
   late File? newImage;
+  var messagesIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -57,25 +59,44 @@ class _ConversationPageState extends State<ConversationPage> {
           );
         }
         if (state is ConversationErrorState) {
-          return Column(
-            children: [
-              const Text('НЕ УДАЛОСЬ ЗАГРУЗИТЬ СООБЩЕНИЯ, ПОФИКСИ ИНЕТ МРАЗЬ'),
-              IconButton(
-                  onPressed: () => context.read<ConversationBloc>().add(ConversationLoadingEvent(chatRoomID: widget.chatRoom.chatRoomId.toString())),
-                  icon: const Icon(
-                    Icons.update,
-                    size: 50,
-                  )),
-            ],
+          print(state.message);
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Failed to load messages, try again....'),
+                  SizedBox(
+                    width: 30,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(
+                            Icons.arrow_back_ios_rounded,
+                            size: 50,
+                          )),
+                      SizedBox(
+                        width: 30,
+                      ),
+                      IconButton(
+                          onPressed: () => context.read<ConversationBloc>().add(ConversationLoadingEvent(chatRoomID: widget.chatRoom.chatRoomId.toString())),
+                          icon: const Icon(
+                            Icons.update,
+                            size: 50,
+                          )),
+                    ],
+                  )
+                ],
+              ),
+            ),
           );
         }
         if (state is ConversationLoadedState) {
           messages = state.messages;
-
-          final int index = messages.length;
-          // WidgetsBinding.instance!.addPostFrameCallback((_) => scrollIndex(index));
-          // scrollIndex(5);
-
+          messagesIndex = messages.length - 1;
         }
         return Scaffold(
           appBar: AppBar(
@@ -128,7 +149,7 @@ class _ConversationPageState extends State<ConversationPage> {
                           PopupMenuItem(child: Text('id for join: ${widget.chatRoom.chatRoomId}')),
                           PopupMenuItem(
                               child: Row(
-                                children: [
+                                children: const [
                                   Icon(
                                     Icons.update,
                                     color: Colors.black,
@@ -155,7 +176,7 @@ class _ConversationPageState extends State<ConversationPage> {
                               }),
                           PopupMenuItem(
                               child: Row(
-                                children: [
+                                children: const [
                                   Icon(
                                     Icons.delete,
                                     color: Colors.black,
@@ -180,46 +201,19 @@ class _ConversationPageState extends State<ConversationPage> {
                 child: StreamBuilder<List<Message>>(
                   stream: context.read<ConversationBloc>().getUpdateMessages(widget.chatRoom.chatRoomId.toString()),
                   builder: (context, snapshot) {
-                    // return ScrollablePositionedList.builder(
-                    // initialScrollIndex: messages.length - 1,
-                    // itemScrollController: itemScrollController,
-                    return ListView.builder(
+                    return ScrollablePositionedList.builder(
+                    initialScrollIndex: messagesIndex,
+                    itemScrollController: itemScrollController,
+                    // return ListView.builder(
                       physics: const BouncingScrollPhysics(),
                       itemCount: messages.length,
                       itemBuilder: (context, index) => Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          alignment: widget.user.user!.email == messages[index].email ? Alignment.centerRight : Alignment.centerLeft,
-                          child: Container(
-                            constraints: const BoxConstraints(maxWidth: 250, minWidth: 70),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: (widget.user.user!.email == messages[index].email) ? kDefaultGradient : [Colors.white, Colors.white],
-                              ),
-                              borderRadius: BorderRadius.circular(5),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 1,
-                                  blurRadius: 2,
-                                  offset: Offset(1, 2), // changes position of shadow
-                                ),
-                              ],
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    messages[index].email,
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, fontFamily: 'SF'),
-                                  ),
-                                  Text(messages[index].message.toString()),
-                                ],
-                              ),
-                            ),
+                        child: Bubble(
+                          style: widget.user.user!.email == messages[index].email ? styleMe : styleSomebody,
+                          child: Text(
+                            messages[index].message.toString(),
+                            style: TextStyle(color: widget.user.user!.email == messages[index].email ? Colors.white : Color(0xFFAC83F0),)
                           ),
                         ),
                       ),
@@ -266,6 +260,9 @@ class _ConversationPageState extends State<ConversationPage> {
                               authorIcon: '');
 
                           fireStoreMethods.sendMessage(message.toJson(), widget.chatRoom.chatRoomId.toString());
+
+
+                          FocusManager.instance.primaryFocus?.unfocus();
                           messageController.clear();
                         },
                         icon: const Icon(

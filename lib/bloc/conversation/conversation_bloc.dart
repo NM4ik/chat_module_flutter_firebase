@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:chat_flutter/bloc/chat/chats_cubit.dart';
@@ -46,6 +47,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         return messages;
       }
     } catch (e) {
+      print(e.toString());
       emit(ConversationErrorState(message: e.toString()));
     }
   }

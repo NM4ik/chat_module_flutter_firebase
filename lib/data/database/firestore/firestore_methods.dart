@@ -28,8 +28,14 @@ class FireStoreMethods {
   /// CRUD-operation with firestore
 
   sendMessage(Map<String, dynamic> messageMap, String documentId) {
-    rooms.doc(documentId).collection('messages').add(messageMap).catchError((e) => print('SEND MESSAGE ERROR:  ${e.toString()}'));
-    updateChatRoomLastMessageAndTime(messageMap['message'], documentId);
+
+    if(messageMap['message'] == ''){
+      return;
+    }
+    else {
+      rooms.doc(documentId).collection('messages').add(messageMap).catchError((e) => print('SEND MESSAGE ERROR:  ${e.toString()}'));
+      updateChatRoomLastMessageAndTime(messageMap['message'], documentId);
+    }
   }
 
   updateChatRoomLastMessageAndTime(String lastMessage, String documentId) {
@@ -42,6 +48,7 @@ class FireStoreMethods {
     List<dynamic> ids = [uid];
 
     String id = chatName + random.toString();
+
 
     ChatRoom chatRoom =
         ChatRoom(name: chatName, chatRoomId: id, lastMessageTime: '', chatLastMessage: '', chatIcon: chatIcon.isEmpty ? '' : chatIcon, usersId: ids);

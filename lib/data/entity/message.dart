@@ -15,13 +15,13 @@ class Message extends Equatable {
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
         sendBy: json['sendBy'],
-        time: (DateTime.fromMillisecondsSinceEpoch(int.parse(json['time']))).toString(),
+        time: json['time'].toString(),
         message: json['message'],
         authorIcon: json['authorIcon'],
         email: json['email']);
   }
 
   Map<String, dynamic> toJson() {
-    return {'sendBy': sendBy, 'time': time, 'message': message, 'authorIcon': authorIcon, 'email': email};
+    return {'sendBy': sendBy, 'time': int.parse(time!), 'message': message, 'authorIcon': authorIcon, 'email': email};
   }
 }
