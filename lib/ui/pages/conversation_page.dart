@@ -43,15 +43,7 @@ class _ConversationPageState extends State<ConversationPage> {
     return BlocBuilder<ConversationBloc, ConversationState>(
       builder: (context, state) {
         if (state is ConversationEmptyState) {
-          Message message = Message(
-            sendBy: 'chatApp',
-            time: DateTime.now().millisecondsSinceEpoch.toString(),
-            email: 'chatApp',
-            message: "You're don't have any messages yet",
-            authorIcon: '',
-          );
-
-          fireStoreMethods.sendMessage(message.toJson(), widget.chatRoom.chatRoomId.toString());
+          fireStoreMethods.sendMessageFromChatApp('${widget.user.user!.displayName} created the chat',  widget.chatRoom.chatRoomId.toString());
         }
         if (state is ConversationLoadingState) {
           return const Center(
@@ -174,6 +166,25 @@ class _ConversationPageState extends State<ConversationPage> {
 
                                 Navigator.of(context).pop();
                               }),
+
+                      PopupMenuItem(
+                          child: Row(
+                            children: const [
+                              Icon(
+                                Icons.logout,
+                                color: Colors.black,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text('leave the chat room'),
+                            ],
+                          ),
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            fireStoreMethods.leaveFromChatRoom(widget.chatRoom.chatRoomId.toString(), widget.user.user!.uid, widget.user.user!.displayName.toString());
+                          }),
+
                           PopupMenuItem(
                               child: Row(
                                 children: const [

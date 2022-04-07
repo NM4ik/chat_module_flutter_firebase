@@ -29,7 +29,7 @@ class _AuthenticatedPageState extends State<AuthenticatedPage> {
             listener: (context, state) {
               if (state is Uninitialized) {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => SplashPage()),
+                  MaterialPageRoute(builder: (context) => const SplashPage()),
                 );
               } else if (state is Authenticated) {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
@@ -50,7 +50,7 @@ class _AuthenticatedPageState extends State<AuthenticatedPage> {
                 ),
                 const Spacer(),
                 PrimaryButton(
-                  color: const Color(0xFF6485E6),
+                  color: const Color(0xFFAC83F0),
                   text: 'Login with Google',
                   press: () {
                     authBloc.add(AuthenticationLoggedIn());

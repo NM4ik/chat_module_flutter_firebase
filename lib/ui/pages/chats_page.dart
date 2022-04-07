@@ -197,7 +197,7 @@ class _ChatsPageState extends State<ChatsPage> {
               controller: chatNameController,
               decoration: const InputDecoration(
                 hintText: 'insert chat name to join',
-                labelText: 'chat-name',
+                labelText: 'chat id',
               ),
               // onSubmitted: (text) {
               // },
@@ -215,7 +215,7 @@ class _ChatsPageState extends State<ChatsPage> {
               TextButton(
                   onPressed: () {
                     try {
-                      fireStoreMethods.joinChatRoom(chatNameController.text, widget.user.user!.uid);
+                      fireStoreMethods.joinChatRoom(chatNameController.text, widget.user.user!.uid, widget.user.user!.displayName.toString());
                       ScaffoldMessenger.of(context)
                           .showSnackBar(SnackBar(content: Text('Room: ${chatNameController.text} was added'), backgroundColor: const Color(0xFFAC83F0)));
                     } catch (_) {

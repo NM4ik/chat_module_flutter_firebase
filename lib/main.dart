@@ -51,7 +51,8 @@ class MyApp extends StatelessWidget {
                   user: state.user,
                 );
               } else if (state is Unauthenticated) {
-                return const AuthenticatedPage();
+                // return const AuthenticatedPage();
+                return const WelcomePage();
               } else if (state is Uninitialized) {
                 return const SplashPage();
               }

@@ -28,14 +28,27 @@ class FireStoreMethods {
   /// CRUD-operation with firestore
 
   sendMessage(Map<String, dynamic> messageMap, String documentId) {
-
-    if(messageMap['message'] == ''){
+    if (messageMap['message'] == '') {
       return;
-    }
-    else {
+    } else {
       rooms.doc(documentId).collection('messages').add(messageMap).catchError((e) => print('SEND MESSAGE ERROR:  ${e.toString()}'));
       updateChatRoomLastMessageAndTime(messageMap['message'], documentId);
     }
+  }
+
+  sendMessageFromChatApp(String content, String documentId) {
+    Message message = Message(
+      sendBy: 'chatApp',
+      time: DateTime.now().millisecondsSinceEpoch.toString(),
+      email: 'chatApp',
+      message: content,
+      authorIcon: '',
+    );
+
+    final messageMap = message.toJson();
+
+    rooms.doc(documentId).collection('messages').add(messageMap).catchError((e) => print('message send error:  ${e.toString()}'));
+    updateChatRoomLastMessageAndTime(messageMap['message'], documentId);
   }
 
   updateChatRoomLastMessageAndTime(String lastMessage, String documentId) {
@@ -49,7 +62,6 @@ class FireStoreMethods {
 
     String id = chatName + random.toString();
 
-
     ChatRoom chatRoom =
         ChatRoom(name: chatName, chatRoomId: id, lastMessageTime: '', chatLastMessage: '', chatIcon: chatIcon.isEmpty ? '' : chatIcon, usersId: ids);
 
@@ -58,9 +70,17 @@ class FireStoreMethods {
     return id;
   }
 
-  joinChatRoom(String chatRoomId, String uid) {
+  joinChatRoom(String chatRoomId, String uid, String name) {
     rooms.doc(chatRoomId).update({
       'users': FieldValue.arrayUnion([uid])
     });
+    sendMessageFromChatApp('$name joined the chat', chatRoomId.toString());
+  }
+
+  leaveFromChatRoom(String chatRoomId, String uid, String name) {
+    rooms.doc(chatRoomId).update({
+      'users': FieldValue.arrayRemove([uid])
+    });
+    sendMessageFromChatApp('$name left the chat',  chatRoomId);
   }
 }
